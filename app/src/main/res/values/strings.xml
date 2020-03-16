@@ -1,0 +1,21 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="app_name">Go4Lunch</string>
+    <string name="tab_label1">Map View</string>
+    <string name="tab_label2">List View</string>
+    <string name="tab_label3">Workmates</string>
+    <!-- Used in NavigationDrawer -->
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="connection_succeed">Success</string>
+    <string name="error_no_internet">error no internet</string>
+    <string name="error_unknown_error">unknow error</string>
+    <string name="error_authentication_canceled">error authentification canceled</string>
+
+    <string name="facebook_application_id" translatable="false">193425391869892</string>
+    <string name="facebook_login_protocol_scheme" translatable="false" tools:ignore="UnusedResources">193425391869892</string>
+    <string name="title_activity_maps">Map</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
+</resources>
