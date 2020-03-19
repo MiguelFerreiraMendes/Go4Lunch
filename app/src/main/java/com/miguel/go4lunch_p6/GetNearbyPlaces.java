@@ -1,6 +1,7 @@
 package com.miguel.go4lunch_p6;
 
 import android.os.AsyncTask;
+import android.util.Log;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
@@ -20,35 +21,32 @@ import java.net.URL;
 public class GetNearbyPlaces extends AsyncTask<Object,String,String> {
 
     private GoogleMap mMap;
-    private String url;
-    private InputStream is;
-    private BufferedReader mBufferedReader;
-    private StringBuilder mStringBuilder;
     private String Data;
 
     @Override
     protected String doInBackground(Object... params) {
         mMap = (GoogleMap)params[0];
-        url = (String)params[1];
+        String url = (String) params[1];
 
         try{
             URL myurl = new URL(url);
+            Log.i("url", "url de connection" + myurl);
             HttpURLConnection httpURLConnection = (HttpURLConnection)myurl.openConnection();
             httpURLConnection.connect();
-            is = httpURLConnection.getInputStream();
-            mBufferedReader = new BufferedReader(new InputStreamReader(is));
+            InputStream is = httpURLConnection.getInputStream();
+            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(is));
 
             String line = "";
-            mStringBuilder = new StringBuilder();
+            StringBuilder stringBuilder = new StringBuilder();
 
 
-            while((line = mBufferedReader.readLine())!= null)
+            while((line = bufferedReader.readLine())!= null)
             {
-                mStringBuilder.append(line);
+                stringBuilder.append(line);
 
             }
 
-            Data = mStringBuilder.toString();
+            Data = stringBuilder.toString();
 
 
         } catch(IOException e){
