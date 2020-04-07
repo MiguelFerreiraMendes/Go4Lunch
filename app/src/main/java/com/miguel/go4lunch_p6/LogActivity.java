@@ -2,7 +2,9 @@ package com.miguel.go4lunch_p6;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
+import androidx.multidex.MultiDex;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -20,6 +22,11 @@ public class LogActivity extends AppCompatActivity {
     private static final int RC_SIGN_IN = 123;
     private CoordinatorLayout coordinatorLayout;
 
+    @Override
+    protected void attachBaseContext(Context base){
+        super.attachBaseContext(base);
+        MultiDex.install(this);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

@@ -8,13 +8,16 @@ import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 
 import android.os.Looper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
+import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
@@ -26,9 +29,22 @@ import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.libraries.places.api.Places;
+import com.google.android.libraries.places.api.model.Place;
+import com.google.android.libraries.places.api.model.PlaceLikelihood;
+import com.google.android.libraries.places.api.net.FindCurrentPlaceRequest;
+import com.google.android.libraries.places.api.net.FindCurrentPlaceResponse;
 import com.google.android.libraries.places.api.net.PlacesClient;
 
+
+import java.lang.reflect.Field;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
 import static com.facebook.FacebookSdk.getApplicationContext;
@@ -42,14 +58,11 @@ public class MapViewFragment extends Fragment {
 
     private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 0;
     private boolean mLocationPermissionGranted;
-    MapView mMapView;
+    private MapView mMapView;
     private GoogleMap googleMap;
     private PlacesClient mPlaceClient;
-    private Object mGeoDataClient;
-    private Object mPlaceDetectionClient;
     private FusedLocationProviderClient mFusedLocationProviderClient;
     private Object mLastKnownLocation;
-    private String apiKey = "AIzaSyAfGC10zfgqg54n-hoMT1GhdoJMWFbUcxU";
     private double latitude;
     private double longitude;
 
@@ -62,21 +75,9 @@ public class MapViewFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_map_view, container, false);
 
-        Places.initialize(getApplicationContext(),apiKey);
+        String apiKey = "AIzaSyAfGC10zfgqg54n-hoMT1GhdoJMWFbUcxU";
+        Places.initialize(getApplicationContext(), apiKey);
         mPlaceClient = Places.createClient(getContext());
-       // List<Place.Field> placeFields = Collections.singletonList(Place.Field.NAME);
-       // FindCurrentPlaceRequest request = FindCurrentPlaceRequest.newInstance(placeFields);
-       // Task<FindCurrentPlaceResponse> placeResponse = mPlaceClient.findCurrentPlace(request);
-       // placeResponse.addOnCompleteListener(new OnCompleteListener<FindCurrentPlaceResponse>() {
-       //     @Override
-       //     public void onComplete(@NonNull Task<FindCurrentPlaceResponse> task) {
-       //         FindCurrentPlaceResponse response = task.getResult();
-       //         for (PlaceLikelihood placeLikelihood : response.getPlaceLikelihoods()) {
-       //             Log.i(TAG, String.format("Place '%s' has likelihood: %f",
-       //                     placeLikelihood.getPlace().getName(),
-       //                     placeLikelihood.getLikelihood()));
-//
-       //     }}});
         mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(getContext());
 
         mMapView = rootView.findViewById(R.id.mapView);
@@ -96,9 +97,16 @@ public class MapViewFragment extends Fragment {
                 googleMap = mMap;
 
                 getLocationPermission();
-                findRestaurants(getView());
                 updateLocationUI();
                 getDeviceLocation();
+                getRestaurants(mPlaceClient);
+
+                googleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+                    @Override
+                    public boolean onMarkerClick(Marker marker) {
+                        return true;
+                    }
+                });
 
             }
         });
@@ -106,24 +114,44 @@ public class MapViewFragment extends Fragment {
         return rootView;
     }
 
-    private void findRestaurants(View v){
-        StringBuilder stringBuilder = new StringBuilder("https://maps.googleapis.com/maps/api/place/nearbysearch/json?");
-        stringBuilder.append("location"+latitude+","+longitude);
-        stringBuilder.append("&radius=" +1000);
-        stringBuilder.append("&keyword="+ "restaurant");
-        stringBuilder.append("&key=" + apiKey);
 
-        String url = stringBuilder.toString();
-        Log.i("url", "test URL +"+ url);
 
-        Object dataTransferer[] = new Object[2];
-        dataTransferer[0] = googleMap;
-        dataTransferer[1] = url;
+    private void getRestaurants(PlacesClient placesClient) {
 
-        GetNearbyPlaces getNearbyPlaces = new GetNearbyPlaces();
-        getNearbyPlaces.execute(dataTransferer);
 
+        List<Place.Field> placeFieldsName = Arrays.asList(Place.Field.NAME, Place.Field.ADDRESS, Place.Field.LAT_LNG, Place.Field.TYPES);
+        FindCurrentPlaceRequest request = FindCurrentPlaceRequest.newInstance(placeFieldsName);
+
+        if (ContextCompat.checkSelfPermission(getContext(), ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            Task<FindCurrentPlaceResponse> placeResponse = placesClient.findCurrentPlace(request);
+            placeResponse.addOnCompleteListener(new OnCompleteListener<FindCurrentPlaceResponse>() {
+                @Override
+                public void onComplete(@NonNull Task<FindCurrentPlaceResponse> task) {
+                if (task.isSuccessful()){
+                    FindCurrentPlaceResponse response = task.getResult();
+                    for (PlaceLikelihood placeLikelihood : response.getPlaceLikelihoods()) {
+                        for(Place.Type type : placeLikelihood.getPlace().getTypes()){
+                            Log.e("test",placeLikelihood.getPlace().getName()+"/"+ type.name());
+                        }
+
+                        googleMap.addMarker(new MarkerOptions()
+                        .position(placeLikelihood.getPlace().getLatLng())
+                        .title(placeLikelihood.getPlace().getName()));
+
+                    }
+                } else {
+                    Exception exception = task.getException();
+                    if (exception instanceof ApiException) {
+                        ApiException apiException = (ApiException) exception;
+                        Log.e("OnFailure", "Place not found: " + apiException.getStatusCode());
+                    }
+                }
+            }});
+        } else {
+            getLocationPermission();
+        }
     }
+
 
 
     private void getLocationPermission() {
@@ -141,6 +169,7 @@ public class MapViewFragment extends Fragment {
                     new String[]{ACCESS_FINE_LOCATION},
                     PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
         }
+        Log.i("permission", "Permission : " + mLocationPermissionGranted);
     }
     @Override
     public void onRequestPermissionsResult(int requestCode,
@@ -176,9 +205,10 @@ public class MapViewFragment extends Fragment {
     }
 
     private void getDeviceLocation() {
-        Log.i("position", "ajustement de la position");
+        Log.i("position", "ajustement de la position" + mLocationPermissionGranted);
         try {
             if (mLocationPermissionGranted) {
+                Log.i("position", "OnPermissionGranted");
                 LocationRequest locationRequest = LocationRequest.create();
                 locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
                 locationRequest.setInterval(5);
@@ -190,9 +220,10 @@ public class MapViewFragment extends Fragment {
                         Location location = locationResult.getLastLocation();
                         latitude = location.getLatitude();
                         longitude = location.getLongitude();
+                        Log.i("locationbias","circle:20000@" + longitude+"," + latitude);
                         googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
                                 new LatLng(latitude,
-                                        longitude), 17));
+                                        longitude), 16));
                     }
                 }, Looper.getMainLooper());
             }

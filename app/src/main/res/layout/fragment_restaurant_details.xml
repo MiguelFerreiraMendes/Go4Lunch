@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_height="match_parent"
+    android:layout_width="match_parent"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="match_parent"
+        android:layout_height="250dip"
+        android:background="@android:color/darker_gray"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+    </ImageView>
+
+    <TextView
+        android:id="@+id/textViewName"
+        android:layout_width="match_parent"
+        android:layout_height="80dip"
+        android:background="@color/colorAccent"
+        android:text="    Name"
+        android:textSize="25sp"
+        app:layout_constraintTop_toBottomOf="@+id/imageView">
+
+    </TextView>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@color/colorAccent"
+        android:paddingStart="18dip"
+        android:layout_marginTop="40dp"
+        android:textSize="15sp"
+        android:text=" Restaurant type + adress"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/imageView">
+
+    </TextView>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="228dp"
+        android:layout_marginEnd="16dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:background="@drawable/roundbutton"
+        />
+
+    <Button
+        android:id="@+id/buttonCall"
+        android:layout_width="140dip"
+        android:layout_height="100dip"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textViewName"
+        android:background="@drawable/ic_call_black_24dp"/>
+
+    <Button
+        android:id="@+id/buttonLike"
+        android:layout_width="144dip"
+        android:layout_height="100dip"
+        android:background="@drawable/ic_star_black_24dp"
+        app:layout_constraintEnd_toStartOf="@+id/buttonwebsite"
+        app:layout_constraintStart_toEndOf="@+id/buttonCall"
+        app:layout_constraintTop_toBottomOf="@+id/textViewName" />
+
+    <Button
+        android:id="@+id/buttonwebsite"
+        android:layout_width="140dip"
+        android:layout_height="100dip"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textViewName" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:layout_width="match_parent"
+        android:layout_height="225dip"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/buttonLike" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,0 +1,2 @@
+com/miguel/go4lunch_p6/LogActivity.class
+com/miguel/go4lunch_p6/MainActivity.class
