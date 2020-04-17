@@ -1,5 +1,6 @@
 package com.miguel.go4lunch_p6;
 
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
@@ -104,6 +105,9 @@ public class MapViewFragment extends Fragment {
                 googleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
                     @Override
                     public boolean onMarkerClick(Marker marker) {
+                        Intent myIntent = new Intent(getContext(), RestaurantDetailsActivity.class);
+                        myIntent.putExtra("place_id", marker.getId());
+                        getContext().startActivity(myIntent);
                         return true;
                     }
                 });
@@ -119,7 +123,7 @@ public class MapViewFragment extends Fragment {
     private void getRestaurants(PlacesClient placesClient) {
 
 
-        List<Place.Field> placeFieldsName = Arrays.asList(Place.Field.NAME, Place.Field.ADDRESS, Place.Field.LAT_LNG, Place.Field.TYPES);
+        List<Place.Field> placeFieldsName = Arrays.asList(Place.Field.NAME, Place.Field.LAT_LNG, Place.Field.ID);
         FindCurrentPlaceRequest request = FindCurrentPlaceRequest.newInstance(placeFieldsName);
 
         if (ContextCompat.checkSelfPermission(getContext(), ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
@@ -135,8 +139,7 @@ public class MapViewFragment extends Fragment {
                         }
 
                         googleMap.addMarker(new MarkerOptions()
-                        .position(placeLikelihood.getPlace().getLatLng())
-                        .title(placeLikelihood.getPlace().getName()));
+                        .position(placeLikelihood.getPlace().getLatLng()));
 
                     }
                 } else {
