@@ -42,18 +42,11 @@ import com.google.android.libraries.places.api.net.FindCurrentPlaceResponse;
 import com.google.android.libraries.places.api.net.PlacesClient;
 
 
-import java.lang.reflect.Field;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
 import static com.facebook.FacebookSdk.getApplicationContext;
-
-// A simple {@link Fragment} subclass.
- // Activities that contain this fragment must implement the
- // {@link MapViewFragment.OnFragmentInteractionListener} interface
- // to handle interaction events.
 
 public class MapViewFragment extends Fragment {
 
@@ -63,7 +56,6 @@ public class MapViewFragment extends Fragment {
     private GoogleMap googleMap;
     private PlacesClient mPlaceClient;
     private FusedLocationProviderClient mFusedLocationProviderClient;
-    private Object mLastKnownLocation;
     private double latitude;
     private double longitude;
 
@@ -80,7 +72,6 @@ public class MapViewFragment extends Fragment {
         Places.initialize(getApplicationContext(), apiKey);
         mPlaceClient = Places.createClient(getContext());
         mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(getContext());
-
         mMapView = rootView.findViewById(R.id.mapView);
         mMapView.onCreate(savedInstanceState);
 
@@ -96,6 +87,7 @@ public class MapViewFragment extends Fragment {
             @Override
             public void onMapReady(GoogleMap mMap) {
                 googleMap = mMap;
+                googleMap.setIndoorEnabled(false);
 
                 getLocationPermission();
                 updateLocationUI();
@@ -106,7 +98,7 @@ public class MapViewFragment extends Fragment {
                     @Override
                     public boolean onMarkerClick(Marker marker) {
                         Intent myIntent = new Intent(getContext(), RestaurantDetailsActivity.class);
-                        myIntent.putExtra("place_id", marker.getId());
+                        myIntent.putExtra("place_id", marker.getSnippet());
                         getContext().startActivity(myIntent);
                         return true;
                     }
@@ -123,7 +115,7 @@ public class MapViewFragment extends Fragment {
     private void getRestaurants(PlacesClient placesClient) {
 
 
-        List<Place.Field> placeFieldsName = Arrays.asList(Place.Field.NAME, Place.Field.LAT_LNG, Place.Field.ID);
+        final List<Place.Field> placeFieldsName = Arrays.asList(Place.Field.NAME, Place.Field.LAT_LNG, Place.Field.ID, Place.Field.TYPES);
         FindCurrentPlaceRequest request = FindCurrentPlaceRequest.newInstance(placeFieldsName);
 
         if (ContextCompat.checkSelfPermission(getContext(), ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
@@ -133,14 +125,14 @@ public class MapViewFragment extends Fragment {
                 public void onComplete(@NonNull Task<FindCurrentPlaceResponse> task) {
                 if (task.isSuccessful()){
                     FindCurrentPlaceResponse response = task.getResult();
-                    for (PlaceLikelihood placeLikelihood : response.getPlaceLikelihoods()) {
-                        for(Place.Type type : placeLikelihood.getPlace().getTypes()){
-                            Log.e("test",placeLikelihood.getPlace().getName()+"/"+ type.name());
+                        for (PlaceLikelihood placeLikelihood : response.getPlaceLikelihoods()) {
+
+                        if (placeLikelihood.getPlace().getTypes().toString().contains("RESTAURANT")) {
+                            if (!placeLikelihood.getPlace().getName().equals(""))
+                            googleMap.addMarker(new MarkerOptions()
+                                    .position(placeLikelihood.getPlace().getLatLng())
+                                    .snippet(placeLikelihood.getPlace().getId()));
                         }
-
-                        googleMap.addMarker(new MarkerOptions()
-                        .position(placeLikelihood.getPlace().getLatLng()));
-
                     }
                 } else {
                     Exception exception = task.getException();
@@ -158,11 +150,6 @@ public class MapViewFragment extends Fragment {
 
 
     private void getLocationPermission() {
-        /*
-         * Request location permission, so that we can get the location of the
-         * device. The result of the permission request is handled by a callback,
-         * onRequestPermissionsResult.
-         */
         if (ContextCompat.checkSelfPermission(getApplicationContext(),
                 ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
@@ -172,7 +159,6 @@ public class MapViewFragment extends Fragment {
                     new String[]{ACCESS_FINE_LOCATION},
                     PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
         }
-        Log.i("permission", "Permission : " + mLocationPermissionGranted);
     }
     @Override
     public void onRequestPermissionsResult(int requestCode,
@@ -199,7 +185,7 @@ public class MapViewFragment extends Fragment {
             } else {
             googleMap.setMyLocationEnabled(false);
             googleMap.getUiSettings().setMyLocationButtonEnabled(false);
-            mLastKnownLocation = null;
+                Object lastKnownLocation = null;
             getLocationPermission();
         }
         } catch (SecurityException e)  {
@@ -208,10 +194,8 @@ public class MapViewFragment extends Fragment {
     }
 
     private void getDeviceLocation() {
-        Log.i("position", "ajustement de la position" + mLocationPermissionGranted);
         try {
             if (mLocationPermissionGranted) {
-                Log.i("position", "OnPermissionGranted");
                 LocationRequest locationRequest = LocationRequest.create();
                 locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
                 locationRequest.setInterval(5);
@@ -223,10 +207,9 @@ public class MapViewFragment extends Fragment {
                         Location location = locationResult.getLastLocation();
                         latitude = location.getLatitude();
                         longitude = location.getLongitude();
-                        Log.i("locationbias","circle:20000@" + longitude+"," + latitude);
                         googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
                                 new LatLng(latitude,
-                                        longitude), 16));
+                                        longitude), 17));
                     }
                 }, Looper.getMainLooper());
             }

@@ -6,7 +6,7 @@ import retrofit2.http.Query;
 
 public interface CallService {
 
-    @GET("svc/mostpopular/v2/emailed/7.json")
-    Call<RestaurantResponse> getRestaurant(@Query("key") String apiKey, @Query("input")String input, @Query("inputtype")String textquery, @Query("place_id")String place_id, @Query("locationbias")String locationbias);
+    @GET("/maps/api/place/details/json")
+    Call<JsonResponse> getRestaurant(@Query("key") String apiKey, @Query("place_id")String place_id, @Query("fields") String fields);
 
 }

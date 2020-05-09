@@ -3,7 +3,6 @@ package com.miguel.go4lunch_p6;
 import android.util.Log;
 
 import java.lang.ref.WeakReference;
-import java.util.List;
 
 import androidx.annotation.Nullable;
 import okhttp3.OkHttpClient;
@@ -26,7 +25,7 @@ public class CallRestaurant {
             OkHttpClient.Builder client = new OkHttpClient.Builder();
             client.addInterceptor(loggingInterceptor);
             Retrofit retrofit = new Retrofit.Builder()
-                    .baseUrl("https://maps.googleapis.com/maps/api/place/findplacefromtext/")
+                    .baseUrl("https://maps.googleapis.com")
                     .client(client.build())
                     .addConverterFactory(GsonConverterFactory.create())
                     .build();
@@ -36,24 +35,26 @@ public class CallRestaurant {
     }
 
     public interface Callbacks {
-        void onResponse(@Nullable List<JsonResponse> users);
+        void onResponse(@Nullable JsonResponse details);
         void onFailure();
     }
 
-    public static void fetchRestaurant(Callbacks callbacks, String input, String locationbias){
+    public static void fetchRestaurantDetails(Callbacks callbacks, String place_id, String fields){
 
         final WeakReference<Callbacks> callbacksWeakReference = new WeakReference<Callbacks>(callbacks);
 
-        Call<RestaurantResponse> call = getCallInformationService().getRestaurant(API_KEY, input, "textquery","place_id", locationbias);
-        call.enqueue(new Callback<RestaurantResponse>() {
+        Call<JsonResponse> call = getCallInformationService().getRestaurant(API_KEY, place_id, fields);
+        call.enqueue(new Callback<JsonResponse>() {
 
             @Override
-            public void onResponse(Call<RestaurantResponse> call, Response<RestaurantResponse> response) {
-                if (callbacksWeakReference.get() != null) callbacksWeakReference.get().onResponse(response.body().response);
+            public void onResponse(Call<JsonResponse> call, Response<JsonResponse> response) {
+                if (callbacksWeakReference.get() != null)
+                    //callbacksWeakReference.get().onResponse(response.body().response);
+                    Log.e("test", response.body().getStatus());
             }
 
             @Override
-            public void onFailure(Call<RestaurantResponse> call, Throwable t) {
+            public void onFailure(Call<JsonResponse> call, Throwable t) {
                 Log.e("test", "throwable", t);
                 if (callbacksWeakReference.get() != null) callbacksWeakReference.get().onFailure();
             }

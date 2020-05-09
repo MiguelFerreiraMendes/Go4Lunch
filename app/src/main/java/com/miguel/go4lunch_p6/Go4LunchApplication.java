@@ -4,5 +4,5 @@ import android.app.Application;
 
 import androidx.multidex.MultiDexApplication;
 
-public class Go4LunchApplication extends Application {
+public class Go4LunchApplication extends MultiDexApplication {
 }

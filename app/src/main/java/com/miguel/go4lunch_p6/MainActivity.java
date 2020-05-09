@@ -13,8 +13,6 @@ import com.google.android.material.tabs.TabLayout;
 
 public class MainActivity extends AppCompatActivity {
 
-    private ViewPager mPager;
-    private String placeAPI = "AIzaSyAfGC10zfgqg54n-hoMT1GhdoJMWFbUcxU";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,11 +24,6 @@ public class MainActivity extends AppCompatActivity {
         TabLayout tabLayout = findViewById(R.id.tab_layout);
         tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
 
-        // Initialize the SDK
-        Places.initialize(getApplicationContext(), placeAPI);
-
-        // Create a new Places client instance
-        PlacesClient placesClient = Places.createClient(this);
 
         this.configureViewPagerandTabs();
 
@@ -42,9 +35,9 @@ public class MainActivity extends AppCompatActivity {
         // 2 - Set Adapter PageAdapter and glue it together
         pager.setAdapter(new FragmentAdapter(getSupportFragmentManager(), this) {
         });
-        mPager = pager;
+        ViewPager mPager = pager;
         TabLayout tabs= findViewById(R.id.tab_layout);
-        tabs.setupWithViewPager(pager);
+        tabs.setupWithViewPager(mPager);
     }
 
 }

@@ -22,7 +22,8 @@
         android:layout_width="match_parent"
         android:layout_height="80dip"
         android:background="@color/colorAccent"
-        android:text="    Name"
+        android:text="Name"
+        android:paddingStart="20dp"
         android:textSize="25sp"
         app:layout_constraintTop_toBottomOf="@+id/imageView">
 
@@ -31,11 +32,12 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:id="@+id/adress"
         android:background="@color/colorAccent"
-        android:paddingStart="18dip"
+        android:paddingStart="20dip"
         android:layout_marginTop="40dp"
         android:textSize="15sp"
-        android:text=" Restaurant type + adress"
+        android:text="Restaurant type + adress"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/imageView">
 
@@ -46,41 +48,72 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="228dp"
         android:layout_marginEnd="16dp"
+        android:tint="@color/colorAccent"
+        android:backgroundTint="@android:color/white"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         />
 
-    <Button
-        android:id="@+id/buttonCall"
-        android:layout_width="140dip"
-        android:layout_height="100dip"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textViewName"
-        android:background="@drawable/ic_call_black_24dp"/>
-
-    <Button
-        android:id="@+id/buttonLike"
-        android:layout_width="144dip"
-        android:layout_height="100dip"
-        android:background="@drawable/ic_star_black_24dp"
-        app:layout_constraintEnd_toStartOf="@+id/buttonwebsite"
-        app:layout_constraintStart_toEndOf="@+id/buttonCall"
-        app:layout_constraintTop_toBottomOf="@+id/textViewName" />
-
-    <Button
-        android:id="@+id/buttonwebsite"
-        android:layout_width="140dip"
-        android:layout_height="100dip"
+    <LinearLayout
+        android:id="@+id/linearLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:weightSum="3"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textViewName" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textViewName">
+
+
+        <Button
+            android:textColor="@android:color/background_dark"
+            android:id="@+id/buttonCall"
+            android:paddingTop="20dip"
+            android:layout_weight="1"
+            android:layout_width="140dip"
+            android:layout_height="100dip"
+            android:backgroundTint="@android:color/white"
+            android:text="CALL"
+            android:drawableTop="@drawable/ic_call_black_24dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textViewName" />
+
+        <Button
+            android:textColor="@android:color/background_dark"
+            android:drawableTop="@drawable/ic_star_black_24dp"
+            android:backgroundTint="@android:color/white"
+            android:paddingTop="20dip"
+            android:layout_weight="1"
+            android:id="@+id/buttonLike"
+            android:text="LIKE"
+            android:layout_width="144dip"
+            android:layout_height="100dip"
+            app:layout_constraintEnd_toStartOf="@+id/buttonwebsite"
+            app:layout_constraintStart_toEndOf="@+id/buttonCall"
+            app:layout_constraintTop_toBottomOf="@+id/textViewName" />
+
+        <Button
+            android:textColor="@android:color/background_dark"
+            android:layout_weight="1"
+            android:paddingTop="20dip"
+            android:backgroundTint="@android:color/white"
+            android:text="WEBSITE"
+            android:id="@+id/buttonwebsite"
+            android:layout_width="140dip"
+            android:layout_height="100dip"
+            android:drawableTop="@drawable/ic_website_24dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textViewName" />
+
+    </LinearLayout>
 
     <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerView"
         android:layout_width="match_parent"
         android:layout_height="225dip"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/buttonLike" />
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
