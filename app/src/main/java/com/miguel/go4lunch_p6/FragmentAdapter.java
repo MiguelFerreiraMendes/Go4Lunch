@@ -10,6 +10,7 @@ import androidx.viewpager.widget.PagerAdapter;
 public class FragmentAdapter extends FragmentPagerAdapter {
 
     private Context mContext;
+    private JsonResponse mJsonResponse;
 
     public FragmentAdapter(FragmentManager fm, Context context) {
         super(fm);

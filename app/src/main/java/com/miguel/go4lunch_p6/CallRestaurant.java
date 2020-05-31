@@ -39,23 +39,45 @@ public class CallRestaurant {
         void onFailure();
     }
 
-    public static void fetchRestaurantDetails(Callbacks callbacks, String place_id, String fields){
+    public static void fetchRestaurantDetails(Callbacks callbacks, String place_id){
 
         final WeakReference<Callbacks> callbacksWeakReference = new WeakReference<Callbacks>(callbacks);
 
-        Call<JsonResponse> call = getCallInformationService().getRestaurant(API_KEY, place_id, fields);
+        Call<JsonResponse> call = getCallInformationService().getRestaurant(API_KEY, place_id);
         call.enqueue(new Callback<JsonResponse>() {
 
             @Override
             public void onResponse(Call<JsonResponse> call, Response<JsonResponse> response) {
                 if (callbacksWeakReference.get() != null)
-                    //callbacksWeakReference.get().onResponse(response.body().response);
-                    Log.e("test", response.body().getStatus());
+                    callbacksWeakReference.get().onResponse(response.body());
+                    Log.e("sucess", response.body().getStatus());
             }
 
             @Override
             public void onFailure(Call<JsonResponse> call, Throwable t) {
-                Log.e("test", "throwable", t);
+                Log.e("failure", "throwable", t);
+                if (callbacksWeakReference.get() != null) callbacksWeakReference.get().onFailure();
+            }
+        });
+    }
+
+    public static void fetchRestaurant(Callbacks callbacks, String location){
+
+        final WeakReference<Callbacks> callbacksWeakReference = new WeakReference<Callbacks>(callbacks);
+
+        Call<JsonResponse> call = getCallInformationService().getRestaurant(API_KEY, "restaurant", 100, location);
+        call.enqueue(new Callback<JsonResponse>() {
+
+            @Override
+            public void onResponse(Call<JsonResponse> call, Response<JsonResponse> response) {
+                if (callbacksWeakReference.get() != null)
+                    callbacksWeakReference.get().onResponse(response.body());
+                Log.e("sucess", response.body().getStatus());
+            }
+
+            @Override
+            public void onFailure(Call<JsonResponse> call, Throwable t) {
+                Log.e("failure", "throwable", t);
                 if (callbacksWeakReference.get() != null) callbacksWeakReference.get().onFailure();
             }
         });

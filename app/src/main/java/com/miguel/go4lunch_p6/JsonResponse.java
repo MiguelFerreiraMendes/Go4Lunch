@@ -1,6 +1,10 @@
 package com.miguel.go4lunch_p6;
 
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
+import java.util.ArrayList;
 import java.util.List;
 
 import com.google.gson.annotations.Expose;
@@ -9,23 +13,55 @@ import com.google.gson.annotations.SerializedName;
 
 
 
-    public class JsonResponse {
+public class JsonResponse implements Parcelable {
 
-        @SerializedName("result")
-        @Expose
-        private Result result;
 
-        @SerializedName("status")
-        @Expose
-        private String status;
 
-        public Result getResult() {
-            return result;
+    public List<Result> getResult() {
+        return  result;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    @SerializedName("results")
+    @Expose
+    private List<Result> result;
+
+    @SerializedName("status")
+    @Expose
+    private String status;
+
+    protected JsonResponse(Parcel in) {
+        this.result = new ArrayList<Result>();
+        in.readList(this.result, Result.class.getClassLoader());
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeList(result);
+
+    }
+
+    @SuppressWarnings("unused")
+    public static final Parcelable.Creator<JsonResponse> CREATOR = new Parcelable.Creator<JsonResponse>() {
+        @Override
+        public JsonResponse createFromParcel(Parcel in) {
+            return new JsonResponse(in);
         }
 
-        public String getStatus() {
-            return status;
+        @Override
+        public JsonResponse[] newArray(int size) {
+            return new JsonResponse[size];
         }
+    };
+
 
         protected static class Result {
 
@@ -59,6 +95,20 @@ import com.google.gson.annotations.SerializedName;
         @SerializedName("vicinity")
         @Expose
         private String vicinity;
+        @SerializedName("website")
+        @Expose
+        private String website;
+        @SerializedName("place_id")
+        @Expose
+        private String place_id;
+
+        public String getPlace_id() {
+            return place_id;
+        }
+
+        public String getWebsite() {
+            return website;
+        }
 
         public String getFormattedAddress() {
             return formattedAddress;

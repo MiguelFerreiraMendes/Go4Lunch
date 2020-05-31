@@ -1,13 +1,14 @@
 package com.miguel.go4lunch_p6;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.viewpager.widget.ViewPager;
 
 import android.os.Bundle;
+import android.widget.Toast;
 
-import com.google.android.libraries.places.api.Places;
-import com.google.android.libraries.places.api.net.PlacesClient;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.material.tabs.TabLayout;
 
 
@@ -39,6 +40,7 @@ public class MainActivity extends AppCompatActivity {
         TabLayout tabs= findViewById(R.id.tab_layout);
         tabs.setupWithViewPager(mPager);
     }
+
 
 }
 

@@ -7,6 +7,9 @@ import retrofit2.http.Query;
 public interface CallService {
 
     @GET("/maps/api/place/details/json")
-    Call<JsonResponse> getRestaurant(@Query("key") String apiKey, @Query("place_id")String place_id, @Query("fields") String fields);
+    Call<JsonResponse> getRestaurant(@Query("key") String apiKey, @Query("place_id")String place_id);
+
+    @GET("/maps/api/place/nearbysearch/json")
+    Call<JsonResponse> getRestaurant(@Query("key") String apiKey, @Query("type") String restaurant, @Query("radius") Integer radius, @Query("location") String location );
 
 }
