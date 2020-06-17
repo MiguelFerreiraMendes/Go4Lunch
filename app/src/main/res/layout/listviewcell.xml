@@ -6,7 +6,9 @@
     android:layout_width="match_parent"
     android:layout_height="100dip"
     android:background="@android:color/white"
-    android:clickable="true">
+    android:id="@+id/cell"
+    android:clickable="true"
+    android:focusable="true">
 
     <ImageView
         android:id="@+id/imageView"
@@ -37,7 +39,7 @@
         android:text="Jean Didier is eating french (Le Zinc)"
         android:layout_marginStart="10dip"
         android:textColor="@android:color/black"
-        android:textSize="14sp"
+        android:textSize="12sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -52,7 +54,8 @@
         android:text="Open until 7pm"
         android:textStyle="italic"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView" />
+        app:layout_constraintTop_toBottomOf="@+id/textView"
+        android:textSize="10sp"/>
 
     <TextView
         android:id="@+id/textView2"
@@ -71,7 +74,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="20dip"
-        android:src="@drawable/ic_person_outline_24px"
+        app:srcCompat="@drawable/ic_person_outline_24px"
         android:layout_marginTop="5dip"
         app:layout_constraintEnd_toStartOf="@+id/imageView"
         app:layout_constraintTop_toBottomOf="@+id/textView2" />
@@ -88,28 +91,31 @@
 
     <ImageView
         android:id="@+id/toggleButton"
+        android:backgroundTint="@android:color/holo_orange_light"
         android:layout_width="21dp"
         android:layout_height="21dp"
         android:layout_marginBottom="10dp"
-        android:background="@drawable/ic_star_border_24px"
+        android:background="@drawable/ic_star_black_24dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/imageView" />
 
     <ImageView
         android:id="@+id/toggleButton2"
+        android:backgroundTint="@android:color/holo_orange_light"
         android:layout_width="21dp"
         android:layout_height="21dp"
         android:layout_marginBottom="10dp"
-        android:background="@drawable/ic_star_border_24px"
+        android:background="@drawable/ic_star_black_24dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/toggleButton" />
 
     <ImageView
         android:id="@+id/toggleButton3"
+        android:backgroundTint="@android:color/holo_orange_light"
         android:layout_width="21dp"
         android:layout_height="21dp"
         android:layout_marginBottom="10dp"
-        android:background="@drawable/ic_star_border_24px"
+        android:background="@drawable/ic_star_black_24dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/toggleButton2" />
 

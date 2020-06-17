@@ -9,11 +9,7 @@
         <item name="android:background">@android:color/white</item>
         <!-- Customize your theme here. -->
         <!-- Base application thème. -->
-        <item name="windowNoTitle">true</item>
-        <item name="windowActionBar">false</item>
     </style>
-
-
 
 
 </resources>

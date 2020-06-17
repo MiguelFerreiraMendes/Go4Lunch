@@ -2,6 +2,8 @@ package com.miguel.go4lunch_p6;
 
 import android.util.Log;
 
+import com.miguel.go4lunch_p6.models.JsonResponseDetails;
+
 import java.lang.ref.WeakReference;
 
 import androidx.annotation.Nullable;
@@ -39,22 +41,27 @@ public class CallRestaurant {
         void onFailure();
     }
 
-    public static void fetchRestaurantDetails(Callbacks callbacks, String place_id){
+    public interface CallbacksDetails {
+        void onResponse(@Nullable JsonResponseDetails details);
+        void onFailure();
+    }
 
-        final WeakReference<Callbacks> callbacksWeakReference = new WeakReference<Callbacks>(callbacks);
+    public static void fetchRestaurantDetails(CallbacksDetails callbacks, String place_id){
 
-        Call<JsonResponse> call = getCallInformationService().getRestaurant(API_KEY, place_id);
-        call.enqueue(new Callback<JsonResponse>() {
+        final WeakReference<CallbacksDetails> callbacksWeakReference = new WeakReference<CallbacksDetails>(callbacks);
+
+        Call<JsonResponseDetails> call = getCallInformationService().getRestaurantDetails(API_KEY, place_id);
+        call.enqueue(new Callback<JsonResponseDetails>() {
 
             @Override
-            public void onResponse(Call<JsonResponse> call, Response<JsonResponse> response) {
+            public void onResponse(Call<JsonResponseDetails> call, Response<JsonResponseDetails> response) {
                 if (callbacksWeakReference.get() != null)
                     callbacksWeakReference.get().onResponse(response.body());
                     Log.e("sucess", response.body().getStatus());
             }
 
             @Override
-            public void onFailure(Call<JsonResponse> call, Throwable t) {
+            public void onFailure(Call<JsonResponseDetails> call, Throwable t) {
                 Log.e("failure", "throwable", t);
                 if (callbacksWeakReference.get() != null) callbacksWeakReference.get().onFailure();
             }
@@ -65,7 +72,7 @@ public class CallRestaurant {
 
         final WeakReference<Callbacks> callbacksWeakReference = new WeakReference<Callbacks>(callbacks);
 
-        Call<JsonResponse> call = getCallInformationService().getRestaurant(API_KEY, "restaurant", 100, location);
+        Call<JsonResponse> call = getCallInformationService().getRestaurant(API_KEY, "restaurant", 300, location);
         call.enqueue(new Callback<JsonResponse>() {
 
             @Override

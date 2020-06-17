@@ -1,29 +1,33 @@
 package com.miguel.go4lunch_p6;
 
 import android.content.Context;
+import android.content.Intent;
+import android.location.Location;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import com.bumptech.glide.Glide;
-import java.math.RoundingMode;
-import java.text.DecimalFormat;
+import com.miguel.go4lunch_p6.models.JsonResponseDetails;
 import java.util.Calendar;
 import java.util.List;
 
 import androidx.annotation.NonNull;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 
 public class ListViewAdapter extends RecyclerView.Adapter<MyViewHolder> {
 
-    private JsonResponse mJsonResponse;
+    private List<JsonResponseDetails> mJsonResponse;
     private Context mContext;
+    private String positionA;
 
-    public ListViewAdapter(JsonResponse jsonResponse, Context context){
+    public ListViewAdapter(List<JsonResponseDetails> jsonResponse, Context context, String position){
         mJsonResponse = jsonResponse;
         mContext = context;
+        positionA = position;
     }
 
     @NonNull
@@ -36,24 +40,26 @@ public class ListViewAdapter extends RecyclerView.Adapter<MyViewHolder> {
 
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
-        holder.displayName(mJsonResponse, position);
-        holder.displayPicture(mJsonResponse, mContext,position);
-        holder.displayDate(mJsonResponse, position);
-        holder.displayRating(mJsonResponse, position);
-        holder.displayAdress(mJsonResponse, position);
+        holder.displayName(mJsonResponse.get(position));
+        holder.displayPicture(mJsonResponse.get(position), mContext);
+        holder.displayDate(mJsonResponse.get(position));
+        holder.displayRating(mJsonResponse.get(position));
+        holder.displayAdress(mJsonResponse.get(position));
+        holder.displayDistance(mJsonResponse.get(position), positionA);
+        holder.setonclicklistener(mJsonResponse.get(position), mContext);
 
 
     }
 
     @Override
     public int getItemCount() {
-        return 0;
+        return mJsonResponse.size();
     }
 }
 
 class MyViewHolder extends RecyclerView.ViewHolder {
 
-    private ImageButton mPicture;
+    private ImageView mPicture;
     private TextView mName;
     private TextView mAdress;
     private TextView mHours;
@@ -62,6 +68,7 @@ class MyViewHolder extends RecyclerView.ViewHolder {
     private ImageView star1;
     private ImageView star2;
     private ImageView star3;
+    private ConstraintLayout cell;
 
 
     public MyViewHolder(View itemView) {
@@ -76,59 +83,129 @@ class MyViewHolder extends RecyclerView.ViewHolder {
         star1 = itemView.findViewById(R.id.toggleButton);
         star2 = itemView.findViewById(R.id.toggleButton2);
         star3 = itemView.findViewById(R.id.toggleButton3);
+        cell = itemView.findViewById(R.id.cell);
+
+    }
+    void setonclicklistener(final JsonResponseDetails jsonResponse, final Context context){
+        cell.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(context, RestaurantDetailsActivity.class);
+                intent.putExtra("json", jsonResponse);
+                context.startActivity(intent);
+            }
+        });
     }
 
-    void displayPicture(JsonResponse jsonResponse, Context context, int index) {
-        String Urlphoto = jsonResponse.getResult().get(index).getIcon();
+    void displayPicture(JsonResponseDetails jsonResponse, Context context) {
+        String Urlphoto = jsonResponse.getResult().getIcon();
         Glide.with(context).load(Urlphoto).into(mPicture);
-
-
     }
 
-    void displayName(JsonResponse jsonResponse, int index){
-        mName.setText(jsonResponse.getResult().get(index).getName());
-
+    void displayName(JsonResponseDetails jsonResponse){
+        try {
+            mName.setText(jsonResponse.getResult().getName().substring(0,33));
+        }catch (StringIndexOutOfBoundsException e){
+            mName.setText(jsonResponse.getResult().getName());
+        }
     }
 
-    void displayDate(JsonResponse jsonResponse, int index) {
+    void displayDate(JsonResponseDetails jsonResponse) {
         Calendar calendar = Calendar.getInstance();
         int day = calendar.get(Calendar.DAY_OF_WEEK);
-        switch (day) {
-            case Calendar.SUNDAY:
-                mHours.setText(jsonResponse.getResult().get(index).getOpeningHours().getWeekdayText().get(6));
-                break;
-            case Calendar.MONDAY:
-                mHours.setText(jsonResponse.getResult().get(index).getOpeningHours().getWeekdayText().get(0));
-                break;
-            case Calendar.TUESDAY:
-                mHours.setText(jsonResponse.getResult().get(index).getOpeningHours().getWeekdayText().get(1));
-                break;
-            case Calendar.WEDNESDAY:
-                mHours.setText(jsonResponse.getResult().get(index).getOpeningHours().getWeekdayText().get(2));
-                break;
-            case Calendar.FRIDAY:
-                mHours.setText(jsonResponse.getResult().get(index).getOpeningHours().getWeekdayText().get(4));
-                break;
-            case Calendar.THURSDAY:
-                mHours.setText(jsonResponse.getResult().get(index).getOpeningHours().getWeekdayText().get(3));
-                break;
-            case Calendar.SATURDAY:
-                mHours.setText(jsonResponse.getResult().get(index).getOpeningHours().getWeekdayText().get(5));
-                break;
+        try {
+            switch (day) {
+                case Calendar.SUNDAY:
+                    String hours6 = (jsonResponse.getResult().getOpeningHours().getWeekdayText().get(6));
+                    String[] hours6split = hours6.split("y");
+                    mHours.setText(hours6split[1].trim().substring(2));
+                    break;
+                case Calendar.MONDAY:
+                    String hours0 = (jsonResponse.getResult().getOpeningHours().getWeekdayText().get(0));
+                    String[] hours0split = hours0.split("y");
+                    mHours.setText(hours0split[1].trim().substring(2));
+                    break;
+                case Calendar.TUESDAY:
+                    String hours1 = (jsonResponse.getResult().getOpeningHours().getWeekdayText().get(1));
+                    String[] hours1split = hours1.split("y");
+                    mHours.setText(hours1split[1].trim().substring(2));
+                    break;
+                case Calendar.WEDNESDAY:
+                    String hours2 = (jsonResponse.getResult().getOpeningHours().getWeekdayText().get(2));
+                    String[] hours2split = hours2.split("y");
+                    mHours.setText(hours2split[1].trim().substring(2));
+                    break;
+                case Calendar.FRIDAY:
+                    String hours4 = (jsonResponse.getResult().getOpeningHours().getWeekdayText().get(4));
+                    String[] hours4split = hours4.split("y");
+                    mHours.setText(hours4split[1].trim().substring(2));
+                    break;
+                case Calendar.THURSDAY:
+                    String hours3 = (jsonResponse.getResult().getOpeningHours().getWeekdayText().get(3));
+                    String[] hours3split = hours3.split("y");
+                    mHours.setText(hours3split[1].trim().substring(2));
+                    break;
+                case Calendar.SATURDAY:
+                    String hours5 = (jsonResponse.getResult().getOpeningHours().getWeekdayText().get(5));
+                    String[] hours5split = hours5.split("y");
+                    mHours.setText(hours5split[1].trim().substring(2));
+                    break;
+            }
+        }catch (NullPointerException e){
+            mHours.setText("No hours found");
         }
 
     }
 
-    void displayAdress (JsonResponse jsonResponse, int index) {
-        mAdress.setText(jsonResponse.getResult().get(index).getFormattedAddress());
-
+    void displayAdress (JsonResponseDetails jsonResponse) {
+        try {
+            mAdress.setText(jsonResponse.getResult().getVicinity().substring(0,40));
+        }catch (StringIndexOutOfBoundsException e){
+            mAdress.setText(jsonResponse.getResult().getVicinity());
+        }
     }
 
-    void displayRating (JsonResponse jsonResponse, int index){
-        Double rating = jsonResponse.getResult().get(index).getRating();
-        Double ratingstar = rating/5*3;
-        DecimalFormat df = new DecimalFormat();
-        df.setRoundingMode(RoundingMode.HALF_UP);
-        df.format(ratingstar);
+    void displayRating (JsonResponseDetails jsonResponse){
+        try {
+            Double rating = jsonResponse.getResult().getRating();
+            Double ratingstar = rating / 5 * 3;
+            long finalnote = Math.round(ratingstar);
+            Log.i("rating ==", "" + finalnote);
+            if (finalnote == 1) {
+                star1.setVisibility(View.VISIBLE);
+                star2.setVisibility(View.INVISIBLE);
+                star3.setVisibility(View.INVISIBLE);
+            } else if (finalnote == 2) {
+                star1.setVisibility(View.VISIBLE);
+                star2.setVisibility(View.VISIBLE);
+                star3.setVisibility(View.INVISIBLE);
+
+            } else if (finalnote == 3) {
+                star1.setVisibility(View.VISIBLE);
+                star2.setVisibility(View.VISIBLE);
+                star3.setVisibility(View.VISIBLE);
+            } else {
+                star1.setVisibility(View.INVISIBLE);
+                star2.setVisibility(View.INVISIBLE);
+                star3.setVisibility(View.INVISIBLE);
+            }
+        }catch (NullPointerException ignored) { }
+    }
+
+    void displayDistance (JsonResponseDetails jsonResponseDetails, String position) {
+        Location locationB = new Location("B");
+        locationB.setLatitude(jsonResponseDetails.getResult().getGeometry().getLocation().getLat());
+        locationB.setLongitude(jsonResponseDetails.getResult().getGeometry().getLocation().getLng());
+        String[] positionA =  position.split(",");
+        double latitudeA = Double.parseDouble(positionA[0]);
+        double longitudeA = Double.parseDouble(positionA[1]);
+        Location locationA = new Location("A");
+        locationA.setLongitude(longitudeA);
+        locationA.setLatitude(latitudeA);
+        double distance = locationA.distanceTo(locationB);
+        double distanceroundded = Math.round(distance);
+        String distancefinal = String.valueOf(distanceroundded);
+        String [] finaldistance = distancefinal.split("\\.");
+        mDistance.setText(String.format("%sm", finaldistance[0]));
     }
 }

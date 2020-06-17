@@ -19,6 +19,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.google.android.gms.common.api.ApiException;
@@ -79,6 +80,11 @@ public class MapViewFragment extends Fragment implements CallRestaurant.Callback
         mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(getContext());
         mMapView = rootView.findViewById(R.id.mapView);
         mMapView.onCreate(savedInstanceState);
+        View locationButton = ((View) mMapView.findViewById(Integer.parseInt("1")).getParent()).findViewById(Integer.parseInt("2"));
+        RelativeLayout.LayoutParams rlp = (RelativeLayout.LayoutParams) locationButton.getLayoutParams();
+        rlp.addRule(RelativeLayout.ALIGN_PARENT_TOP, 0);
+        rlp.addRule(RelativeLayout.ALIGN_PARENT_TOP, RelativeLayout.TRUE);
+        rlp.setMargins(0, 1500, 0, 0);
 
 
 
@@ -211,6 +217,7 @@ public class MapViewFragment extends Fragment implements CallRestaurant.Callback
     public void onResponse(@Nullable final JsonResponse nearbySearch) {
         Bundle args = new Bundle();
         args.putParcelable("json", nearbySearch);
+        args.putString("position", position);
         ListViewFragment newfragment = new ListViewFragment();
         newfragment.setArguments(args);
         FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
@@ -219,7 +226,7 @@ public class MapViewFragment extends Fragment implements CallRestaurant.Callback
 
         for (int i = 0; i < nearbySearch.getResult().size(); i++) {
             Log.i("loop", "numéro de boucle  + " + i + nearbySearch.getResult().size());
-        String position = nearbySearch.getResult().get(i).getGeometry().getLocation().getLat() + "," + nearbySearch.getResult().get(i).getGeometry().getLocation().getLat();
+        String position = nearbySearch.getResult().get(i).getGeometry().getLocation().getLat() + "," + nearbySearch.getResult().get(i).getGeometry().getLocation().getLng();
         String[] latlong = position.split(",");
         double latitude = Double.parseDouble(latlong[0]);
         double longitude = Double.parseDouble(latlong[1]);
@@ -227,14 +234,15 @@ public class MapViewFragment extends Fragment implements CallRestaurant.Callback
         googleMap.addMarker(new MarkerOptions()
                 .position(location)
                 .snippet(nearbySearch.getResult().get(i).getPlace_id()));
+
         Log.i("loop", "marker added + " + location);
 
             googleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
                 @Override
                 public boolean onMarkerClick(Marker marker) {
                     Intent myIntent = new Intent(getContext(), RestaurantDetailsActivity.class);
-                    myIntent.putExtra("position", marker.getSnippet());
-                    myIntent.putExtra("json", nearbySearch);
+                    myIntent.putExtra("place_id", marker.getSnippet());
+                    Log.i("placeID", marker.getSnippet());
                     getContext().startActivity(myIntent);
                     return true;
                 }

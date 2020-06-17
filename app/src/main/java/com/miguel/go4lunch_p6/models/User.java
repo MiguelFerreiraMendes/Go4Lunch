@@ -5,13 +5,25 @@ public class User {
     private String id;
     private String username;
     private String urlPicture;
+    private Boolean isInteressed;
 
     public User() {}
+
 
     public User(String id, String username, String urlPicture){
         this.id = id;
         this.username = username;
         this.urlPicture = urlPicture;
+        this.isInteressed = false;
+    }
+
+
+    public Boolean getInteressed() {
+        return isInteressed;
+    }
+
+    public void setInteressed(Boolean interessed) {
+        isInteressed = interessed;
     }
 
     public String getId() {
