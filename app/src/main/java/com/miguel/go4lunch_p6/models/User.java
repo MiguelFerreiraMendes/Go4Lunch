@@ -5,7 +5,6 @@ public class User {
     private String id;
     private String username;
     private String urlPicture;
-    private Boolean isInteressed;
 
     public User() {}
 
@@ -14,17 +13,17 @@ public class User {
         this.id = id;
         this.username = username;
         this.urlPicture = urlPicture;
-        this.isInteressed = false;
+        //this.isInteressed = false;
     }
 
 
-    public Boolean getInteressed() {
-        return isInteressed;
-    }
+    //public Boolean getInteressed() {
+     //   return isInteressed;
+    //}
 
-    public void setInteressed(Boolean interessed) {
-        isInteressed = interessed;
-    }
+    //public void setInteressed(Boolean interessed) {
+      //  isInteressed = interessed;
+    //}
 
     public String getId() {
         return id;

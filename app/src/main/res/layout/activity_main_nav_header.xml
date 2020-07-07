@@ -4,21 +4,20 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="176dip"
-    android:background="#B2B9E1"
+    android:background="@color/quantum_white_100"
     android:orientation="vertical"
     android:id="@+id/navHeaderSearch"
-    android:clickable="true">
+    android:clickable="true"
+    android:focusable="true">
     
     <TextView
-
         android:layout_width="match_parent"
         android:layout_height="96dip"
-        android:text="Go4Lunch"
+        android:text="@string/app_name"
         android:textSize="30sp"
         android:textColor="@color/quantum_black_100"
-        android:gravity="center">
-
-
+        android:gravity="center"
+        android:textStyle="bold">
     </TextView>
 
     <LinearLayout
@@ -29,10 +28,10 @@
 
     <ImageView
         android:id="@+id/imageViewNav"
-        android:layout_width="80dip"
-        android:layout_height="80dip"
-        android:padding="50dip"
-        app:srcCompat="@drawable/ic_star_black_24dp" />
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:padding="50dp"
+        android:background="@drawable/ic_star_black_24dp" />
 
         <LinearLayout
             android:layout_width="wrap_content"

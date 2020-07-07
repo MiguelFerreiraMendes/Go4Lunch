@@ -1,28 +1,23 @@
 package com.miguel.go4lunch_p6;
 
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
-
 import android.os.Looper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.RelativeLayout;
-import android.widget.Toast;
-
-import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
@@ -36,21 +31,12 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.android.libraries.places.api.Places;
-import com.google.android.libraries.places.api.model.Place;
-import com.google.android.libraries.places.api.model.PlaceLikelihood;
-import com.google.android.libraries.places.api.net.FindCurrentPlaceRequest;
-import com.google.android.libraries.places.api.net.FindCurrentPlaceResponse;
-import com.google.android.libraries.places.api.net.PlacesClient;
 
-
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
-import static android.content.Context.MODE_PRIVATE;
 import static com.facebook.FacebookSdk.getApplicationContext;
 
 public class MapViewFragment extends Fragment implements CallRestaurant.Callbacks {
@@ -64,6 +50,7 @@ public class MapViewFragment extends Fragment implements CallRestaurant.Callback
     private double longitude;
     private String position;
     private JsonResponse mJsonResponse;
+
 
 
     public static MapViewFragment newInstance(){
@@ -226,6 +213,7 @@ public class MapViewFragment extends Fragment implements CallRestaurant.Callback
 
         for (int i = 0; i < nearbySearch.getResult().size(); i++) {
             Log.i("loop", "numéro de boucle  + " + i + nearbySearch.getResult().size());
+        Log.i("test", "name resto = " +nearbySearch.getResult().get(i).getName());
         String position = nearbySearch.getResult().get(i).getGeometry().getLocation().getLat() + "," + nearbySearch.getResult().get(i).getGeometry().getLocation().getLng();
         String[] latlong = position.split(",");
         double latitude = Double.parseDouble(latlong[0]);

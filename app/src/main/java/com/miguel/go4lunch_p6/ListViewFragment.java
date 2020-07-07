@@ -1,5 +1,6 @@
 package com.miguel.go4lunch_p6;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -31,7 +32,13 @@ public class ListViewFragment extends Fragment implements CallRestaurant.Callbac
     private int size;
     private ArrayList<JsonResponseDetails> mJsonResponseDetails = new ArrayList<>();
     private String position;
+    OnAdapteurPass mAdapteurPass;
 
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        mAdapteurPass = (OnAdapteurPass) context;
+    }
 
     public static ListViewFragment newInstance(/*JsonResponse jsonResponse*/) {
         ListViewFragment frag1 = new ListViewFragment();
@@ -39,6 +46,9 @@ public class ListViewFragment extends Fragment implements CallRestaurant.Callbac
         arg.getParcelable("json");
         frag1.setArguments(arg);
         return (frag1);
+    }
+    public interface OnAdapteurPass {
+        public void onAdapteurPass(ListViewAdapter adapteur);
     }
 
     @Override
@@ -65,7 +75,11 @@ public class ListViewFragment extends Fragment implements CallRestaurant.Callbac
 
     public void updateRecycleView () {
         ListViewAdapter mondapteur = new ListViewAdapter(mJsonResponseDetails, getContext(), position);
+        passData(mondapteur);
         mRecyclerView.setAdapter(mondapteur);
+    }
+    public void passData(ListViewAdapter adapter){
+        mAdapteurPass.onAdapteurPass(adapter);
     }
 
     @Override

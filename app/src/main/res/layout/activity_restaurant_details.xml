@@ -4,7 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".RestaurantDetailsActivity">
+    tools:context=".RestaurantDetailsActivity"
+    android:background="@color/quantum_white_100">
 
     <ImageView
         android:id="@+id/imageView"
@@ -13,7 +14,8 @@
         android:background="@android:color/darker_gray"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent"
+        android:scaleType="centerCrop">
 
     </ImageView>
 
@@ -51,9 +53,10 @@
         android:layout_marginEnd="16dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/ic_baseline_check_circle_24"
+        android:src="@drawable/ic_baseline_check_circle_24"
+        app:borderWidth="0dp"
         android:tint="@color/quantum_orange700"
-        />
+        tools:ignore="VectorDrawableCompat" />
 
     <LinearLayout
         android:id="@+id/linearLayout"

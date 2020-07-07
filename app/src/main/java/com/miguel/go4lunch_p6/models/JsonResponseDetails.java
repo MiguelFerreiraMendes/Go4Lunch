@@ -2,6 +2,7 @@ package com.miguel.go4lunch_p6.models;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+
 import java.util.ArrayList;
 import java.util.List;
 import com.google.gson.annotations.Expose;
@@ -105,9 +106,11 @@ public class JsonResponseDetails implements Parcelable {
         protected Result(Parcel in) {
             formattedAddress = in.readString();
             formattedPhoneNumber = in.readString();
+            geometry = in.readParcelable(Geometry.class.getClassLoader());
             icon = in.readString();
             internationalPhoneNumber = in.readString();
             name = in.readString();
+            openingHours = in.readParcelable(OpeningHours.class.getClassLoader());
             if (in.readByte() == 0) {
                 rating = null;
             } else {
@@ -117,15 +120,18 @@ public class JsonResponseDetails implements Parcelable {
             vicinity = in.readString();
             website = in.readString();
             place_id = in.readString();
+            photos = in.createTypedArrayList(photo.CREATOR);
         }
 
         @Override
         public void writeToParcel(Parcel dest, int flags) {
             dest.writeString(formattedAddress);
             dest.writeString(formattedPhoneNumber);
+            dest.writeParcelable(geometry, flags);
             dest.writeString(icon);
             dest.writeString(internationalPhoneNumber);
             dest.writeString(name);
+            dest.writeParcelable(openingHours, flags);
             if (rating == null) {
                 dest.writeByte((byte) 0);
             } else {
@@ -136,6 +142,7 @@ public class JsonResponseDetails implements Parcelable {
             dest.writeString(vicinity);
             dest.writeString(website);
             dest.writeString(place_id);
+            dest.writeTypedList(photos);
         }
 
         @Override
@@ -154,6 +161,19 @@ public class JsonResponseDetails implements Parcelable {
                 return new Result[size];
             }
         };
+
+        public List<photo> getPhotos() {
+            return photos;
+        }
+
+
+        public void setPhotos(List<photo> photos) {
+            this.photos = photos;
+        }
+
+        @SerializedName("photos")
+        @Expose
+        private List<photo> photos;
 
         public String getPlace_id() {
             return place_id;
@@ -203,6 +223,73 @@ public class JsonResponseDetails implements Parcelable {
             return vicinity;
         }
 
+    }
+
+    public static class photo implements Parcelable {
+
+        public String getHeight() {
+            return height;
+        }
+
+        public void setHeight(String height) {
+            this.height = height;
+        }
+
+        public String getWidth() {
+            return width;
+        }
+
+        public void setWidth(String width) {
+            this.width = width;
+        }
+
+        public String getPhotoreference() {
+            return photoreference;
+        }
+
+        public void setPhotoreference(String photoreference) {
+            this.photoreference = photoreference;
+        }
+
+        @SerializedName("height")
+        @Expose
+        private String height;
+        @SerializedName("width")
+        @Expose
+        private String width;
+        @SerializedName("photo_reference")
+        @Expose
+        private String photoreference;
+
+        protected photo(Parcel in) {
+            height = in.readString();
+            width = in.readString();
+            photoreference = in.readString();
+        }
+
+        @Override
+        public void writeToParcel(Parcel dest, int flags) {
+            dest.writeString(height);
+            dest.writeString(width);
+            dest.writeString(photoreference);
+        }
+
+        @Override
+        public int describeContents() {
+            return 0;
+        }
+
+        public static final Creator<photo> CREATOR = new Creator<photo>() {
+            @Override
+            public photo createFromParcel(Parcel in) {
+                return new photo(in);
+            }
+
+            @Override
+            public photo[] newArray(int size) {
+                return new photo[size];
+            }
+        };
     }
 
     public static class Geometry implements Parcelable {

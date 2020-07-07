@@ -2,34 +2,39 @@ package com.miguel.go4lunch_p6;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.viewpager.widget.ViewPager;
 
+import android.app.AlarmManager;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.RequestOptions;
 import com.firebase.ui.auth.AuthUI;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.tabs.TabLayout;
-import com.miguel.go4lunch_p6.api.UserChoices;
+import com.miguel.go4lunch_p6.api.UserHelper;
+
+import java.util.Calendar;
 
 
-public class MainActivity extends BaseActivity implements NavigationView.OnNavigationItemSelectedListener {
+public class MainActivity extends BaseActivity implements NavigationView.OnNavigationItemSelectedListener, ListViewFragment.OnAdapteurPass {
 
     private NavigationView navigationView;
     private DrawerLayout drawerLayout;
@@ -38,6 +43,8 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     private TextView textViewEmail;
     private ImageView ppuser;
     private static final int UPDATE_USERNAME = 30;
+    private ListViewAdapter mAdapter = null;
+    public static final String CHANNEL_1_ID = "channel1";
 
 
     @Override
@@ -46,7 +53,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         setContentView(R.layout.activity_main);
 
         Toolbar toolbar = findViewById(R.id.toolbar);
-        Log.i("test toolbar" , "" + toolbar.getTitle());
+        setSupportActionBar(toolbar);
         TabLayout tabLayout = findViewById(R.id.tab_layout);
         tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
         this.configureNavigationView();
@@ -59,6 +66,38 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         this.updateUIWhenCreating();
         updateUsernameInFirebase();
 
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menutoolbar, menu);
+
+        MenuItem searchrestaurant = menu.findItem(R.id.menu_activity_main_search);
+        SearchView searchView = (SearchView) searchrestaurant.getActionView();
+
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                if (mAdapter!= null){
+                    mAdapter.getFilter().filter(newText);
+                }
+                return false;
+            }
+        });
+        return true;
+    }
+
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        if (id == R.id.menu_activity_main_search){
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     private void configureViewPagerandTabs(){
@@ -80,11 +119,26 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         if (this.getCurrentUser() != null){
         //Get picture URL from Firebase
         if (this.getCurrentUser().getPhotoUrl() != null) {
-            Log.i("test", "" + this.getCurrentUser().getPhotoUrl());
+            Log.i("test", "Totaux" + this.getCurrentUser().getPhotoUrl());
+          /*
             Glide.with(MainActivity.this)
-                    .load(this.getCurrentUser().getPhotoUrl())
-                    .apply(RequestOptions.circleCropTransform())
+                    .load(this.getCurrentUser().getPhotoUrl().toString().trim())
+                    .addListener(new RequestListener<Drawable>() {
+                        @Override
+                        public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
+                            Log.e("test", "glide failed");
+                            return false;
+                        }
+
+                        @Override
+                        public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
+                            Log.e("test", "glide sucess");
+                            return false;
+                        }
+                    })
+                   // .apply(RequestOptions.circleCropTransform())
                     .into(ppuser);
+          */
         }
 
         //Get email & username from Firebase
@@ -116,6 +170,39 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         return true;
     }
 
+    private void startAlarm() {
+
+        Calendar calendar = Calendar.getInstance();
+
+        calendar.setTimeInMillis(System.currentTimeMillis());
+        calendar.set(Calendar.HOUR, 12);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+
+        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        Intent intent = new Intent(this, AlertReceiver.class);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 1, intent, PendingIntent.FLAG_CANCEL_CURRENT);
+        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
+                AlarmManager.INTERVAL_DAY, pendingIntent);
+
+    }
+
+    private void createNotificationChannels() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+            NotificationChannel chanel1 = new NotificationChannel(CHANNEL_1_ID, "Channel 1", NotificationManager.IMPORTANCE_HIGH);
+            chanel1.setDescription("Channel 1");
+            NotificationManager manager = getSystemService(NotificationManager.class);
+            manager.createNotificationChannel(chanel1);
+        }
+    }
+
+    private void stopAlarm(){
+        Intent intent = new Intent(this, AlertReceiver.class);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), 1253, intent, 0);
+        AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+        alarmManager.cancel(pendingIntent);
+    }
+
     private void signOutUserFromFirebase(){
         AuthUI.getInstance()
                 .signOut(this)
@@ -143,7 +230,6 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
 
     private void configureDrawerLayout(){
         this.drawerLayout = findViewById(R.id.drawerlayout);
-        drawerLayout.setBackgroundColor(getResources().getColor(R.color.quantum_orange400));
         Toolbar toolbar = findViewById(R.id.toolbar);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawerLayout.addDrawerListener(toggle);
@@ -165,9 +251,14 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
 
         if (this.getCurrentUser() != null){
             if (!username.isEmpty() &&  !username.equals(getString(R.string.info_no_username_found))){
-                UserChoices.updateUsername(username, this.getCurrentUser().getUid()).addOnFailureListener(this.onFailureListener()).addOnSuccessListener(this.updateUIAfterRESTRequestsCompleted(UPDATE_USERNAME));
+                UserHelper.updateUsername(username, this.getCurrentUser().getUid()).addOnFailureListener(this.onFailureListener()).addOnSuccessListener(this.updateUIAfterRESTRequestsCompleted(UPDATE_USERNAME));
             }
         }
+    }
+
+    @Override
+    public void onAdapteurPass(ListViewAdapter adapteur) {
+        this.mAdapter = adapteur;
     }
 }
 

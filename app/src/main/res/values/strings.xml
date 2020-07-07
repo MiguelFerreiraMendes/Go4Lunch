@@ -10,12 +10,9 @@
     <string name="error_no_internet">error no internet</string>
     <string name="error_unknown_error">unknown error</string>
     <string name="error_authentication_canceled">error authentification canceled</string>
-
     <string name="facebook_application_id" translatable="false">193425391869892</string>
     <string name="facebook_login_protocol_scheme" translatable="false" tools:ignore="UnusedResources">193425391869892</string>
     <string name="title_activity_maps">Map</string>
-
-    <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="info_no_email_found">emailnotfound</string>
     <string name="info_no_username_found">usernamenotfound</string>

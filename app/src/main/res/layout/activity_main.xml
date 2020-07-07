@@ -5,22 +5,22 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MainActivity"
-    android:id="@+id/drawerlayout">
+    android:id="@+id/drawerlayout"
+    android:background="@color/quantum_white_100">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-
-    <androidx.appcompat.widget.Toolbar
-        android:id="@+id/toolbar"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:background="@color/colorAccent"
-        app:title="@string/app_name"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        <androidx.appcompat.widget.Toolbar
+            style="@style/ToolbarTheme"
+            android:id="@+id/toolbar"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:title="@string/app_name"/>
 
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/tab_layout"
@@ -28,7 +28,7 @@
         android:layout_height="60dip"
         app:tabTextColor="@android:color/black"
         app:tabSelectedTextColor="@color/colorAccent"
-        app:tabIndicatorColor="@android:color/white"
+        app:tabIndicatorColor="@color/quantum_white_100"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"/>
@@ -46,11 +46,13 @@
 
     <com.google.android.material.navigation.NavigationView
         android:id="@+id/activity_main_nav_view"
+        app:itemIconSize="40dp"
+        app:itemTextAppearance="@style/NavigationDrawerStyle"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_gravity="start"
         android:fitsSystemWindows="true"
-        app:itemTextColor="@color/quantum_black_100"
+        android:background="@color/quantum_orange400"
         app:headerLayout="@layout/activity_main_nav_header"
         app:menu="@menu/menudrawer" />
 

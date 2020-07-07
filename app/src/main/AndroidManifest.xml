@@ -19,20 +19,16 @@
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
 
-
-        <activity android:name=".RestaurantDetailsActivity">
-
-        </activity>
-
+        <activity android:name=".RestaurantDetailsActivity"> </activity>
         <activity android:name=".WebViewActivity">
 
         </activity>
-
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key" />
 
         <activity android:name=".MainActivity" />
+
         <activity android:name=".LogActivity"
             android:parentActivityName=".MainActivity">
             <intent-filter>

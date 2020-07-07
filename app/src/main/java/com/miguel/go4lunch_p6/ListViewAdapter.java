@@ -7,10 +7,14 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.miguel.go4lunch_p6.models.JsonResponseDetails;
+
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
@@ -18,9 +22,10 @@ import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 
-public class ListViewAdapter extends RecyclerView.Adapter<MyViewHolder> {
+public class ListViewAdapter extends RecyclerView.Adapter<MyViewHolder> implements Filterable {
 
     private List<JsonResponseDetails> mJsonResponse;
+    private List<JsonResponseDetails> mJsonResponseFull;
     private Context mContext;
     private String positionA;
 
@@ -28,6 +33,7 @@ public class ListViewAdapter extends RecyclerView.Adapter<MyViewHolder> {
         mJsonResponse = jsonResponse;
         mContext = context;
         positionA = position;
+        mJsonResponseFull = new ArrayList<>(jsonResponse);
     }
 
     @NonNull
@@ -55,6 +61,39 @@ public class ListViewAdapter extends RecyclerView.Adapter<MyViewHolder> {
     public int getItemCount() {
         return mJsonResponse.size();
     }
+
+    @Override
+    public Filter getFilter() {
+        return listfilter;
+    }
+    private Filter listfilter = new Filter() {
+        @Override
+        protected FilterResults performFiltering(CharSequence constraint) {
+            List<JsonResponseDetails> filteredList = new ArrayList<>();
+
+            if (constraint == null || constraint.length() == 0){
+                filteredList.addAll(mJsonResponseFull);
+            }else{
+                String filterPattern = constraint.toString().toLowerCase().trim();
+
+                for(JsonResponseDetails jsonDetails : mJsonResponseFull){
+                    if(jsonDetails.getResult().getName().toLowerCase().contains(filterPattern)){
+                        filteredList.add(jsonDetails);
+                    }
+                }
+            }
+            FilterResults results = new FilterResults();
+            results.values = filteredList;
+            return results;
+        }
+
+        @Override
+        protected void publishResults(CharSequence constraint, FilterResults results) {
+            mJsonResponse.clear();
+            mJsonResponse.addAll((List) results.values);
+            notifyDataSetChanged();
+        }
+    };
 }
 
 class MyViewHolder extends RecyclerView.ViewHolder {
@@ -98,8 +137,15 @@ class MyViewHolder extends RecyclerView.ViewHolder {
     }
 
     void displayPicture(JsonResponseDetails jsonResponse, Context context) {
-        String Urlphoto = jsonResponse.getResult().getIcon();
-        Glide.with(context).load(Urlphoto).into(mPicture);
+     //   String Urlphoto = jsonResponse.getResult().getIcon();
+     //   Glide.with(context).load(Urlphoto).into(mPicture);
+        try {
+            String photo = "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=" + jsonResponse.getResult().getPhotos().get(0).getPhotoreference() + "&sensor=false&key=AIzaSyAfGC10zfgqg54n-hoMT1GhdoJMWFbUcxU";
+            Glide.with(context).load(photo).into(mPicture);
+        }catch (NullPointerException e){
+               String Urlphoto = jsonResponse.getResult().getIcon();
+               Glide.with(context).load(Urlphoto).into(mPicture);
+        }
     }
 
     void displayName(JsonResponseDetails jsonResponse){
@@ -207,5 +253,9 @@ class MyViewHolder extends RecyclerView.ViewHolder {
         String distancefinal = String.valueOf(distanceroundded);
         String [] finaldistance = distancefinal.split("\\.");
         mDistance.setText(String.format("%sm", finaldistance[0]));
+    }
+
+    void displayPhoto (JsonResponseDetails jsonResponseDetails, String position){
+
     }
 }

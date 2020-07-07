@@ -3,20 +3,20 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:showIn="navigation_view">
 
-    <item android:title="Categories">
-        <menu>
             <group android:checkableBehavior="single">
+                <item android:title="">
+                </item>
                 <item
+                    android:icon="@drawable/ic_baseline_local_dining_24"
                     android:id="@+id/your_lunch"
                     android:title="YOUR LUNCH" />
                 <item
+                    android:icon="@drawable/ic_baseline_settings_24"
                     android:id="@+id/settings"
                     android:title="SETTINGS" />
                 <item
+                    android:icon="@drawable/ic_baseline_power_settings_new_24"
                     android:id="@+id/logout"
                     android:title="LOGOUT"/>
             </group>
-        </menu>
-    </item>
-
 </menu>
