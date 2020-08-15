@@ -8,12 +8,6 @@ import androidx.appcompat.app.AppCompatActivity;
 
 public abstract class BaseActivity extends AppCompatActivity {
 
-
-
-    // --------------------
-    // UTILS
-    // --------------------
-
     @Nullable
     protected FirebaseUser getCurrentUser(){ return FirebaseAuth.getInstance().getCurrentUser(); }
 

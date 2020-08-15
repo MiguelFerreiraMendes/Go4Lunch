@@ -4,14 +4,15 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import controler.WorkmatesAdapter;
 import android.Manifest;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -20,23 +21,25 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.libraries.places.api.Places;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.miguel.go4lunch_p6.api.UserHelper;
 import com.miguel.go4lunch_p6.models.JsonResponseDetails;
-import com.miguel.go4lunch_p6.models.Restaurant;
-
-import java.util.Map;
+import com.miguel.go4lunch_p6.models.RestaurantInfo;
+import com.miguel.go4lunch_p6.models.User;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
 
 
 public class RestaurantDetailsActivity extends AppCompatActivity implements CallRestaurant.CallbacksDetails {
@@ -48,10 +51,12 @@ public class RestaurantDetailsActivity extends AppCompatActivity implements Call
     private LinearLayout website;
     private LinearLayout like;
     private FloatingActionButton fab;
+    private User mUser;
     private static final int REQUEST_CALL = 1;
     private JsonResponseDetails mJsonResponse;
-    private SharedPreferences mSharedPreferences;
     private String myuserID = FirebaseAuth.getInstance().getCurrentUser().getUid();
+    private String formattedDate;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,7 +64,6 @@ public class RestaurantDetailsActivity extends AppCompatActivity implements Call
         setContentView(R.layout.activity_restaurant_details);
         String apiKey = "AIzaSyAfGC10zfgqg54n-hoMT1GhdoJMWFbUcxU";
         Places.initialize(getApplicationContext(), apiKey);
-        mSharedPreferences = this.getSharedPreferences(myuserID, MODE_PRIVATE);
         mImageview = findViewById(R.id.imageView);
         name = findViewById(R.id.textViewName);
         adress = findViewById(R.id.adress);
@@ -68,10 +72,16 @@ public class RestaurantDetailsActivity extends AppCompatActivity implements Call
         like = findViewById(R.id.buttonLike);
         fab = findViewById(R.id.fab);
 
+        Date c = Calendar.getInstance().getTime();
+        SimpleDateFormat df = new SimpleDateFormat("dd-MMM-yyyy", Locale.getDefault());
+        formattedDate = df.format(c);
+        getUser();
+
         final JsonResponseDetails jsonResponseDetails = getIntent().getExtras().getParcelable("json");
         if (jsonResponseDetails != null) {
             getfirebasedata(jsonResponseDetails);
             setparameters(jsonResponseDetails);
+            checkworkmates();
         } else {
             Bundle bundle = getIntent().getExtras();
             String id = bundle.getString("place_id");
@@ -91,9 +101,22 @@ public class RestaurantDetailsActivity extends AppCompatActivity implements Call
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 makePhoneCall("tel:" + mJsonResponse.getResult().getFormattedPhoneNumber());
             } else {
-                Toast.makeText(this, "Permission DENIED", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, R.string.permissionDenied, Toast.LENGTH_SHORT).show();
             }
         }
+    }
+
+    private void getUser(){
+        UserHelper.getUsersCollection().document(myuserID).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+            @Override
+            public void onSuccess(DocumentSnapshot documentSnapshot) {
+                mUser = documentSnapshot.toObject(User.class);
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+            }
+        });
     }
 
     private void makePhoneCall(String phonenumber) {
@@ -105,19 +128,18 @@ public class RestaurantDetailsActivity extends AppCompatActivity implements Call
                 startActivity(new Intent(Intent.ACTION_CALL, Uri.parse(dial)));
             }
         } else {
-            Toast.makeText(this, "No phone number available", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.NoPhonenumberavailable, Toast.LENGTH_SHORT).show();
         }
     }
 
     @Override
     public void onResponse(@Nullable final JsonResponseDetails details) {
-        Log.i("position", "lat lng : " + details.getResult());
-        Log.i("position", "lat lng : " + details.getResult().getGeometry().getLocation());
         getfirebasedata(details);
         setparameters(details);
+        checkworkmates();
     }
 
-    private void getfirebasedata (final JsonResponseDetails jsonResponseDetails) {
+    private void getfirebasedata(final JsonResponseDetails jsonResponseDetails) {
         DocumentReference docIdRef = UserHelper.getUsersCollection().document(myuserID).collection("Restaurant").document(jsonResponseDetails.getResult().getName());
         docIdRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
@@ -126,13 +148,24 @@ public class RestaurantDetailsActivity extends AppCompatActivity implements Call
                     DocumentSnapshot document = task.getResult();
                     if (!document.exists()) {
                         UserHelper.createRestaurantInfo(myuserID, jsonResponseDetails.getResult().getName(), 0, false);
-                        Log.i("docref", "found");
                     }
-                } else {
-                    Log.d("docref", "Failed with: ", task.getException());
                 }
             }
         });
+
+        DocumentReference docIdRef2 = FirebaseFirestore.getInstance().collection("Restaurant").document(jsonResponseDetails.getResult().getName());
+        docIdRef2.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    if (!document.exists()) {
+                        UserHelper.createRestaurant(jsonResponseDetails.getResult().getName());
+                    }
+                }
+            }
+        });
+
     }
 
     private void setparameters(final JsonResponseDetails details) {
@@ -153,75 +186,71 @@ public class RestaurantDetailsActivity extends AppCompatActivity implements Call
                     Toast.makeText(getBaseContext(), "No Website found", Toast.LENGTH_SHORT).show();
                 } else {
                     try {
-                        Log.i("url", "url du website = " + details.getResult().getWebsite().toString());
                         Intent intent = new Intent(getBaseContext(), WebViewActivity.class);
-                        intent.putExtra("url", details.getResult().getWebsite().toString().trim());
+                        intent.putExtra("url", details.getResult().getWebsite());
                         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                         getBaseContext().startActivity(intent);
                     } catch (NullPointerException e) {
-                        Toast.makeText(getBaseContext(), "No Website found", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getBaseContext(), R.string.noWebsiteFound, Toast.LENGTH_SHORT).show();
                     }
                 }
             }
         });
-        fab.setOnClickListener(new View.OnClickListener() {
+
+        FirebaseFirestore.getInstance().collection("Restaurant").document(mJsonResponse.getResult().getName()).collection(formattedDate).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
-            public void onClick(View v) {
-                if (mSharedPreferences.getString("lastrestaurant", "").equals("")){
-                UserHelper.updateIsInteressed(myuserID, true, details.getResult().getName());
-                mSharedPreferences.edit()
-                        .putString("lastrestaurant", details.getResult().getName())
-                        .apply();
-                Log.i("test", "CLICK");
-                fab.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.colorgrey)));
-                fab.setColorFilter(getResources().getColor(R.color.quantum_googgreen400));
-            }else{
-                UserHelper.updateIsInteressed(myuserID, true, details.getResult().getName());
-                UserHelper.updateIsInteressed(myuserID, false, mSharedPreferences.getString("lastrestaurant", ""));
-                    mSharedPreferences.edit()
-                            .putString("lastrestaurant", details.getResult().getName())
-                            .apply();
-                fab.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.colorgrey)));
-                fab.setColorFilter(getResources().getColor(R.color.quantum_googgreen400));
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if (task.isSuccessful()) {
+                    List<User> list = new ArrayList<>();
+                    for (DocumentSnapshot document : task.getResult()) {
+                        User user = document.toObject(User.class);
+                        list.add(user);
+
+                    }
+                    setrecyclerview(list);
                 }
             }
         });
+
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mUser.getRestaurantInteressed().equals("false")) {
+                    FirebaseFirestore.getInstance().collection("Restaurant").document(mJsonResponse.getResult().getName()).collection(formattedDate).document(myuserID).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                        @Override
+                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                            DocumentSnapshot documentSnapshot1 = task.getResult();
+                            if (!documentSnapshot1.exists()) {
+
+                                FirebaseFirestore.getInstance().collection("Restaurant").document(mJsonResponse.getResult().getName()).collection(formattedDate).document(myuserID).set(mUser).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<Void> task) {
+                                        fab.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.colorgrey)));
+                                        fab.setColorFilter(getResources().getColor(R.color.quantum_googgreen400));
+                                    }
+                                });
+                            }
+                        }
+                    });
+                    UserHelper.updateIsInteressed(myuserID, mJsonResponse.getResult().getName());
+                    getUser();
+                    UserHelper.updateIDofRestaurantInteressed(mJsonResponse.getResult().getPlace_id(), myuserID);
+                } else {
+                    if (mUser.getRestaurantInteressed().equals(mJsonResponse.getResult().getName())) {
+                        Toast.makeText(getBaseContext(), R.string.alreadysignupthisrest, Toast.LENGTH_LONG).show();
+                    }else{
+                        Toast.makeText(getBaseContext(), R.string.alreadysignupanotherrest, Toast.LENGTH_LONG).show();
+                    }
+                }
+            }
+        });
+
         like.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
                 RetrieveLike(details);
-
-           //     RetrieveLike(details.getResult().getName());
-
-            //    DatabaseReference rootRef = FirebaseDatabase.getInstance().getReference();
-            //    DatabaseReference uidRef = rootRef.child(myuserID);
-            //    ValueEventListener valueEventListener = new ValueEventListener() {
-            //        @Override
-            //        public void onDataChange(DataSnapshot dataSnapshot) {
-            //            if(dataSnapshot.child("like").getValue(int.class).equals(1)) {
-            //                Toast.makeText(getBaseContext(), "You already liked this restaurant", Toast.LENGTH_SHORT).show();
-            //            } else if (dataSnapshot.child("like").getValue(int.class).equals(1)) {
-            //                UserHelper.updatelike(myuserID, 1, details.getResult().getName());
-            //                Toast.makeText(getBaseContext(), "Like successfully register", Toast.LENGTH_SHORT).show();
-            //            }
-            //        }
-//
-            //        @Override
-            //        public void onCancelled(@NonNull DatabaseError databaseError) {
-            //            Log.d("DataBaseError", databaseError.getMessage());
-            //        }
-            //    };
-            //    uidRef.addListenerForSingleValueEvent(valueEventListener);
-                //               if (UserHelper.getRestaurantinfo(myuserID, "" == 1){
-                //                   Toast.makeText(getBaseContext(), "You already liked this restaurant", Toast.LENGTH_SHORT).show();
-                //               }else{
-                //                   UserHelper.updatelike(myuserID, 1, details.getResult().getName());
-                //                   Toast.makeText(getBaseContext(), "Like successfully register", Toast.LENGTH_SHORT).show();
-                //               }
-                //           }
-                //       });
-            }});
+            }
+        });
 
 
         call.setOnClickListener(new View.OnClickListener() {
@@ -230,7 +259,7 @@ public class RestaurantDetailsActivity extends AppCompatActivity implements Call
                 if (details.getResult().getFormattedPhoneNumber() != null) {
                     makePhoneCall(details.getResult().getFormattedPhoneNumber());
                 } else {
-                    Toast.makeText(getBaseContext(), "No Phone number available", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getBaseContext(), R.string.noPhoneAvailable, Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -239,25 +268,59 @@ public class RestaurantDetailsActivity extends AppCompatActivity implements Call
 
     @Override
     public void onFailure() {
-        Log.i("reponse", "response = failed");
-
     }
 
-    private void RetrieveLike(final JsonResponseDetails jsonResponseDetails){
+    private void RetrieveLike(final JsonResponseDetails jsonResponseDetails) {
         final DocumentReference docIdRef = UserHelper.getUsersCollection().document(myuserID).collection("Restaurant").document(jsonResponseDetails.getResult().getName());
         docIdRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                 if (task.isSuccessful()) {
-         //           DocumentSnapshot document = task.getResult();
-         //           Log.i("test",  "" + docIdRef.get());
-         //           Map<String, Object> documentdata = document.getData();
-         //           Log.i("test",  "" + documentdata.get(Restaurant.class));
-                } else {
-                    Log.d("docref", "Failed with: ", task.getException());
+                    DocumentSnapshot document = task.getResult();
+                    RestaurantInfo restaurantInfo = document.toObject(RestaurantInfo.class);
+                    if (restaurantInfo.getLike() == 0) {
+                        UserHelper.updatelike(myuserID, 1, jsonResponseDetails.getResult().getName());
+                        Toast.makeText(getBaseContext(), R.string.likeRegistered, Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(getBaseContext(), R.string.alreadtlikethisrest, Toast.LENGTH_SHORT).show();
+                    }
                 }
             }
         });
     }
+
+
+    private void checkworkmates() {
+
+        FirebaseFirestore.getInstance().collection("Restaurant").document(mJsonResponse.getResult().getName()).collection(formattedDate).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if (task.isSuccessful()) {
+                    List<User> list = new ArrayList<>();
+                    for (DocumentSnapshot document : task.getResult()) {
+                        User user = document.toObject(User.class);
+                        list.add(user);
+                    }
+                    setrecyclerview(list);
+                }
+            }
+        });
+    }
+
+    private void setrecyclerview(List<User> listuserinteressed) {
+
+        if (listuserinteressed != null){
+            for (int i = 0; i < listuserinteressed.size(); i++ ){
+                if (listuserinteressed.get(i).getId().equals(myuserID)){
+                    listuserinteressed.remove(i);
+                }
+            }
+            RecyclerView recyclerView = findViewById(R.id.recyclerViewWorkmate);
+            recyclerView.setLayoutManager(new LinearLayoutManager(getBaseContext(), LinearLayoutManager.VERTICAL, false));
+            WorkmatesAdapter mondapteur = new WorkmatesAdapter(listuserinteressed, getBaseContext(), "a");
+            recyclerView.setAdapter(mondapteur);
+        }
+    }
 }
+
 

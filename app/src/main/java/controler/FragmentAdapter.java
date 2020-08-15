@@ -1,16 +1,19 @@
-package com.miguel.go4lunch_p6;
+package controler;
 
 import android.content.Context;
+
+import com.miguel.go4lunch_p6.ListViewFragment;
+import com.miguel.go4lunch_p6.MapViewFragment;
+import com.miguel.go4lunch_p6.R;
+import com.miguel.go4lunch_p6.WorkmatesFragment;
 
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentPagerAdapter;
-import androidx.viewpager.widget.PagerAdapter;
 
 public class FragmentAdapter extends FragmentPagerAdapter {
 
     private Context mContext;
-    private JsonResponse mJsonResponse;
 
     public FragmentAdapter(FragmentManager fm, Context context) {
         super(fm);
@@ -19,7 +22,7 @@ public class FragmentAdapter extends FragmentPagerAdapter {
 
     @Override
     public int getCount() {
-        return(3); // 3 - Number of page to show
+        return(3);
     }
 
     @Override

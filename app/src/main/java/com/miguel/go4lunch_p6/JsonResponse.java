@@ -1,16 +1,10 @@
 package com.miguel.go4lunch_p6;
 
-
 import android.os.Parcel;
 import android.os.Parcelable;
-
-import java.util.ArrayList;
 import java.util.List;
-
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
-
-
 
 
 public class JsonResponse implements Parcelable {
@@ -59,8 +53,6 @@ public class JsonResponse implements Parcelable {
     @SerializedName("status")
     @Expose
     private String status;
-
-
 
         protected static class Result implements Parcelable {
 

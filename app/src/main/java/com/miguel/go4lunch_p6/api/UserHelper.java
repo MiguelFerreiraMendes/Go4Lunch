@@ -7,56 +7,59 @@ import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.miguel.go4lunch_p6.models.Restaurant;
+import com.miguel.go4lunch_p6.models.RestaurantInfo;
 import com.miguel.go4lunch_p6.models.User;
-
 
 public class UserHelper {
 
     private static final String COLLECTION_NAME = "userschoices";
 
 
-    public static Task<Void> createUser(String uid, String username, String urlPicture) {
-        // 1 - Create User object
-        User userToCreate = new User(uid, username, urlPicture);
-        // 2 - Add a new User Document to Firestore
+    public static Task<Void> createUser(String uid, String username, String urlPicture, String interessed) {
+        User userToCreate = new User(uid, username, urlPicture, interessed, "null");
         return UserHelper.getUsersCollection()
-                .document(uid) // Setting uID for Document
-                .set(userToCreate); // Setting object for Document
+                .document(uid)
+                .set(userToCreate);
     }
 
     public static Task<Void> createRestaurantInfo(String uid, String NameRestaurant, int like, Boolean isinteressed){
-        // 1 - Create User object
-        Restaurant restaurantToCreate = new Restaurant(NameRestaurant, like , isinteressed);
-        // 2 - Add a new User Document to Firestore
-        Log.i("firebase", " uid = " + uid + "NameRestaurant = " + NameRestaurant + "restaurant tocreate" + restaurantToCreate);
+        RestaurantInfo restaurantInfoToCreate = new RestaurantInfo(NameRestaurant, like , isinteressed);
+        Log.i("firebase", " uid = " + uid + "NameRestaurant = " + NameRestaurant + "restaurant tocreate" + restaurantInfoToCreate);
         return UserHelper.getUsersCollection()
                 .document(uid)
                 .collection("Restaurant")
                 .document(NameRestaurant)
-                .set(restaurantToCreate); // Setting object for Document
+                .set(restaurantInfoToCreate); // Setting object for Document
     }
 
+    public static Task<Void> createRestaurant(String NameRestaurant){
+        Restaurant restaurantInfoToCreate = new Restaurant(NameRestaurant);
+        return FirebaseFirestore.getInstance().collection("Restaurant")
+                .document(NameRestaurant)
+                .set(restaurantInfoToCreate); // Setting object for Document
+    }
 
-    // --- COLLECTION REFERENCE ---
 
     public static CollectionReference getUsersCollection(){
         return FirebaseFirestore.getInstance().collection(COLLECTION_NAME);
     }
 
-    // --- GET ---
 
     public static Task<DocumentSnapshot> getUser(String uid){
         return UserHelper.getUsersCollection().document(uid).get();
     }
 
-    // --- UPDATE ---
 
     public static Task<Void> updateUsername(String username, String uid) {
         return UserHelper.getUsersCollection().document(uid).update("username", username);
     }
 
-    public static Task<Void> updateIsInteressed(String uid, Boolean isInteressed, String nameRestaurant) {
-        return UserHelper.getUsersCollection().document(uid).collection("Restaurant").document(nameRestaurant).update("interessed", isInteressed);
+    public static Task<Void> updateIDofRestaurantInteressed(String idRestaurant, String uid) {
+        return UserHelper.getUsersCollection().document(uid).update("idOfRestaurantInteressed", idRestaurant);
+    }
+
+    public static Task<Void> updateIsInteressed(String uid, String nameRestaurant) {
+        return UserHelper.getUsersCollection().document(uid).update("restaurantInteressed", nameRestaurant);
     }
 
     public static Task<Void> updatelike(String uid, int like, String nameRestaurant) {
@@ -67,7 +70,6 @@ public class UserHelper {
         return UserHelper.getUsersCollection().document(uid).collection("Restaurant").document(nameRestaurant).get();
     }
 
-    // --- DELETE ---
 
     public static Task<Void> deleteUser(String uid) {
         return UserHelper.getUsersCollection().document(uid).delete();

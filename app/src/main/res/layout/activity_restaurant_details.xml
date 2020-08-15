@@ -95,7 +95,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dip"
                 android:layout_gravity="center"
-                android:text="CALL"
+                android:text="@string/call"
                 android:textStyle="bold"
                 android:textColor="@color/colorAccent"
                 android:textSize="20sp"
@@ -161,7 +161,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dip"
                 android:layout_gravity="center"
-                android:text="WEBSITE"
+                android:text="@string/website"
                 android:textStyle="bold"
                 android:textColor="@color/colorAccent"
                 android:textSize="20sp"
@@ -172,7 +172,7 @@
     </LinearLayout>
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerView"
+        android:id="@+id/recyclerViewWorkmate"
         android:layout_width="match_parent"
         android:layout_height="225dip"
         app:layout_constraintEnd_toEndOf="parent"

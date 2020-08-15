@@ -4,18 +4,19 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.multidex.MultiDex;
-
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
-
 import com.firebase.ui.auth.AuthUI;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.miguel.go4lunch_p6.api.UserHelper;
-
 import java.util.Arrays;
 
 public class LogActivity extends AppCompatActivity {
@@ -31,7 +32,6 @@ public class LogActivity extends AppCompatActivity {
     @Nullable
     protected FirebaseUser getCurrentUser(){ return FirebaseAuth.getInstance().getCurrentUser(); }
 
-    protected Boolean isCurrentUserLogged(){ return (this.getCurrentUser() != null); }
 
 
     @Override
@@ -48,7 +48,10 @@ public class LogActivity extends AppCompatActivity {
                         .createSignInIntentBuilder()
                         .setAvailableProviders(
                                 Arrays.asList( new AuthUI.IdpConfig.GoogleBuilder().build(),
-                                               new AuthUI.IdpConfig.FacebookBuilder().build()))
+                                               new AuthUI.IdpConfig.FacebookBuilder().build(),
+                                               new AuthUI.IdpConfig.TwitterBuilder().build(),
+                                               new AuthUI.IdpConfig.EmailBuilder().build()
+                                                ))
                         .setIsSmartLockEnabled(false, true)
                         .setTheme(R.style.Logactivity)
                         .build(),
@@ -58,7 +61,6 @@ public class LogActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        // 4 - Handle SignIn Activity response on activity result
         this.handleResponseAfterSignIn(requestCode, resultCode, data);
     }
 
@@ -76,16 +78,23 @@ public class LogActivity extends AppCompatActivity {
 
     private void createUserInFirestore(){
 
+
         if (this.getCurrentUser() != null){
-
-            String urlPicture = (this.getCurrentUser().getPhotoUrl() != null) ? this.getCurrentUser().getPhotoUrl().toString() : null;
-            String username = this.getCurrentUser().getDisplayName();
-            String uid = this.getCurrentUser().getUid();
-
-            UserHelper.createUser(uid, username, urlPicture).addOnFailureListener(new OnFailureListener() {
+            FirebaseFirestore.getInstance().collection("userschoices").document(getCurrentUser().getUid()).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                 @Override
-                public void onFailure(@NonNull Exception e) {
-                    Log.i("Error", "Didn't create user in firebase");
+                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                    if (!task.getResult().exists()) {
+                        String urlPicture = (getCurrentUser().getPhotoUrl() != null) ? getCurrentUser().getPhotoUrl().toString() : null;
+                        String username = getCurrentUser().getDisplayName();
+                        String uid = getCurrentUser().getUid();
+
+                        UserHelper.createUser(uid, username, urlPicture, "false").addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                Log.i("Error", "Didn't create user in firebase");
+                            }
+                        });
+                    }
                 }
             });
         }

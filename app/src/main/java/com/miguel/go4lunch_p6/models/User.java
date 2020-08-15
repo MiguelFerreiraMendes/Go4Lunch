@@ -5,25 +5,35 @@ public class User {
     private String id;
     private String username;
     private String urlPicture;
+    private String restaurantInteressed;
+    private String idOfRestaurantInteressed;
 
     public User() {}
 
 
-    public User(String id, String username, String urlPicture){
+    public User(String id, String username, String urlPicture, String restaurantInteressed, String idofrest){
         this.id = id;
         this.username = username;
         this.urlPicture = urlPicture;
-        //this.isInteressed = false;
+        this.restaurantInteressed = restaurantInteressed;
+        this.idOfRestaurantInteressed = idofrest;
     }
 
 
-    //public Boolean getInteressed() {
-     //   return isInteressed;
-    //}
+    public String getRestaurantInteressed() {
+        return restaurantInteressed;
+    }
 
-    //public void setInteressed(Boolean interessed) {
-      //  isInteressed = interessed;
-    //}
+    public void setRestaurantInteressed(String restaurantInteressed) {
+        this.restaurantInteressed = restaurantInteressed;
+    }
+    public String getIdOfRestaurantInteressed() {
+        return idOfRestaurantInteressed;
+    }
+
+    public void setIdOfRestaurantInteressed(String idOfRestaurantInteressed) {
+        this.idOfRestaurantInteressed = idOfRestaurantInteressed;
+    }
 
     public String getId() {
         return id;

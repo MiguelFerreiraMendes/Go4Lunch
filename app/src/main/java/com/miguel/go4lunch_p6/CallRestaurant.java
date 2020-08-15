@@ -1,14 +1,9 @@
 package com.miguel.go4lunch_p6;
 
-import android.util.Log;
-
 import com.miguel.go4lunch_p6.models.JsonResponseDetails;
-
 import java.lang.ref.WeakReference;
-
 import androidx.annotation.Nullable;
 import okhttp3.OkHttpClient;
-import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -22,10 +17,7 @@ public class CallRestaurant {
 
     public static CallService getCallInformationService(){
         if(callInformationService == null){
-            HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor();
-            loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
             OkHttpClient.Builder client = new OkHttpClient.Builder();
-            client.addInterceptor(loggingInterceptor);
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl("https://maps.googleapis.com")
                     .client(client.build())
@@ -57,12 +49,10 @@ public class CallRestaurant {
             public void onResponse(Call<JsonResponseDetails> call, Response<JsonResponseDetails> response) {
                 if (callbacksWeakReference.get() != null)
                     callbacksWeakReference.get().onResponse(response.body());
-                    Log.e("sucess", response.body().getStatus());
             }
 
             @Override
             public void onFailure(Call<JsonResponseDetails> call, Throwable t) {
-                Log.e("failure", "throwable", t);
                 if (callbacksWeakReference.get() != null) callbacksWeakReference.get().onFailure();
             }
         });
@@ -79,12 +69,10 @@ public class CallRestaurant {
             public void onResponse(Call<JsonResponse> call, Response<JsonResponse> response) {
                 if (callbacksWeakReference.get() != null)
                     callbacksWeakReference.get().onResponse(response.body());
-                Log.e("sucess", response.body().getStatus());
             }
 
             @Override
             public void onFailure(Call<JsonResponse> call, Throwable t) {
-                Log.e("failure", "throwable", t);
                 if (callbacksWeakReference.get() != null) callbacksWeakReference.get().onFailure();
             }
         });

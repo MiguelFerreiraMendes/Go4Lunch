@@ -1,25 +1,16 @@
 <resources>
 
-    <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat.NoActionBar">
-        <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
 
-        <!-- Customize your theme here. -->
-        <!-- Base application thème. -->
     </style>
 
-    <style name="Logactivity" parent="Theme.AppCompat.NoActionBar">
-        <!-- Customize your theme here. -->
+    <style name="Logactivity" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
-        <item name="android:background">@color/quantum_white_100</item>
-
-        <!-- Customize your theme here. -->
-        <!-- Base application thème. -->
     </style>
 
     <style name="ToolbarTheme" parent="Widget.AppCompat.Toolbar">

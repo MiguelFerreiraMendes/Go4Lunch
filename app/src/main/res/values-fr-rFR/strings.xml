@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Go4Lunch</string>
+    <string name="tab_label1">Carte</string>
+    <string name="tab_label2">Liste</string>
+    <string name="tab_label3">Collègues</string>
+    <string name="error_no_internet">Erreur pas d\'internet</string>
+    <string name="error_unknown_error">Erreur inconnu</string>
+    <string name="error_authentication_canceled">Erreur authentification annulé</string>
+    <string name="info_no_email_found">Email introuvable</string>
+    <string name="info_no_username_found">Nom d\'utilisateur introuvable</string>
+    <string name="call">APPEL</string>
+    <string name="website">SITE</string>
+    <string name="iseatingat">" mange à "</string>
+    <string name="hasntdecided">" n'a pas encore décidé"</string>
+    <string name="isjoining">" mange ici"</string>
+    <string name="NoHoursFound">Heures introuvable</string>
+    <string name="notifON">Notifications activées</string>
+    <string name="notifOFF">Notifications désactivées</string>
+    <string name="alreadysignupthisrest">Vous avez déja choisis ce restaurant</string>
+    <string name="alreadysignupanotherrest">Vous avez choisis un autre restaurant</string>
+    <string name="noPhoneAvailable">Aucun numéro disponible</string>
+    <string name="likeRegistered">Like enregistré</string>
+    <string name="alreadtlikethisrest">Vous avez déja Like ce restaurant</string>
+    <string name="noWebsiteFound">Pas de site disponible</string>
+    <string name="permissionDenied">Permission refusé</string>
+    <string name="NoPhonenumberavailable">Aucun numéro disponible</string>
+</resources>

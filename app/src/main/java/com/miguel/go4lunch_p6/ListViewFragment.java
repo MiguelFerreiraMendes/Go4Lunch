@@ -6,30 +6,19 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ProgressBar;
-
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import com.miguel.go4lunch_p6.models.JsonResponseDetails;
-
-import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.ListIterator;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import controler.ListViewAdapter;
 
 
 public class ListViewFragment extends Fragment implements CallRestaurant.CallbacksDetails {
 
     private RecyclerView mRecyclerView;
-    private int size;
     private ArrayList<JsonResponseDetails> mJsonResponseDetails = new ArrayList<>();
     private String position;
     OnAdapteurPass mAdapteurPass;
@@ -40,7 +29,7 @@ public class ListViewFragment extends Fragment implements CallRestaurant.Callbac
         mAdapteurPass = (OnAdapteurPass) context;
     }
 
-    public static ListViewFragment newInstance(/*JsonResponse jsonResponse*/) {
+    public static ListViewFragment newInstance() {
         ListViewFragment frag1 = new ListViewFragment();
         Bundle arg = new Bundle();
         arg.getParcelable("json");
@@ -55,17 +44,14 @@ public class ListViewFragment extends Fragment implements CallRestaurant.Callbac
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View result = inflater.inflate(R.layout.listviewfragment, container, false);
-        //JsonResponse jsonResponse = arg.getParcelable("jsonResponse");
-        //Log.i("json", "json dans le fragment listview = " + getArguments().getParcelable("json"));
         JsonResponse jsonResponse = getArguments().getParcelable("json");
         position = getArguments().getString("position");
 
         if (jsonResponse != null) {
-        this.size = jsonResponse.getResult().size();
+            int size = jsonResponse.getResult().size();
         mRecyclerView = result.findViewById(R.id.recycleview_view_listview);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
             for (int i = 0; i <= size - 1; i++){
-                Log.i("loop", "test SIZE = " + jsonResponse.getResult().size()  + "test INDEX = " + i);
                 CallRestaurant.fetchRestaurantDetails(this, jsonResponse.getResult().get(i).getPlace_id());
             }
         }

@@ -1,9 +1,8 @@
-package com.miguel.go4lunch_p6;
+package controler;
 
 import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,12 +11,20 @@ import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.TextView;
 import com.bumptech.glide.Glide;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
+import com.miguel.go4lunch_p6.R;
+import com.miguel.go4lunch_p6.RestaurantDetailsActivity;
 import com.miguel.go4lunch_p6.models.JsonResponseDetails;
-
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
-
+import java.util.Locale;
 import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
@@ -53,8 +60,7 @@ public class ListViewAdapter extends RecyclerView.Adapter<MyViewHolder> implemen
         holder.displayAdress(mJsonResponse.get(position));
         holder.displayDistance(mJsonResponse.get(position), positionA);
         holder.setonclicklistener(mJsonResponse.get(position), mContext);
-
-
+        holder.displaynumberOfPeople(mJsonResponse.get(position));
     }
 
     @Override
@@ -108,6 +114,8 @@ class MyViewHolder extends RecyclerView.ViewHolder {
     private ImageView star2;
     private ImageView star3;
     private ConstraintLayout cell;
+    private String formattedDate;
+
 
 
     public MyViewHolder(View itemView) {
@@ -123,6 +131,9 @@ class MyViewHolder extends RecyclerView.ViewHolder {
         star2 = itemView.findViewById(R.id.toggleButton2);
         star3 = itemView.findViewById(R.id.toggleButton3);
         cell = itemView.findViewById(R.id.cell);
+        Date c = Calendar.getInstance().getTime();
+        SimpleDateFormat df = new SimpleDateFormat("dd-MMM-yyyy", Locale.getDefault());
+        formattedDate = df.format(c);
 
     }
     void setonclicklistener(final JsonResponseDetails jsonResponse, final Context context){
@@ -137,8 +148,6 @@ class MyViewHolder extends RecyclerView.ViewHolder {
     }
 
     void displayPicture(JsonResponseDetails jsonResponse, Context context) {
-     //   String Urlphoto = jsonResponse.getResult().getIcon();
-     //   Glide.with(context).load(Urlphoto).into(mPicture);
         try {
             String photo = "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=" + jsonResponse.getResult().getPhotos().get(0).getPhotoreference() + "&sensor=false&key=AIzaSyAfGC10zfgqg54n-hoMT1GhdoJMWFbUcxU";
             Glide.with(context).load(photo).into(mPicture);
@@ -198,7 +207,7 @@ class MyViewHolder extends RecyclerView.ViewHolder {
                     break;
             }
         }catch (NullPointerException e){
-            mHours.setText("No hours found");
+            mHours.setText(R.string.NoHoursFound);
         }
 
     }
@@ -214,9 +223,8 @@ class MyViewHolder extends RecyclerView.ViewHolder {
     void displayRating (JsonResponseDetails jsonResponse){
         try {
             Double rating = jsonResponse.getResult().getRating();
-            Double ratingstar = rating / 5 * 3;
+            Double ratingstar = rating / 5 * 3 - 0.5;
             long finalnote = Math.round(ratingstar);
-            Log.i("rating ==", "" + finalnote);
             if (finalnote == 1) {
                 star1.setVisibility(View.VISIBLE);
                 star2.setVisibility(View.INVISIBLE);
@@ -255,7 +263,18 @@ class MyViewHolder extends RecyclerView.ViewHolder {
         mDistance.setText(String.format("%sm", finaldistance[0]));
     }
 
-    void displayPhoto (JsonResponseDetails jsonResponseDetails, String position){
-
+    void displaynumberOfPeople (JsonResponseDetails jsonResponseDetails){
+        FirebaseFirestore.getInstance().collection("Restaurant").document(jsonResponseDetails.getResult().getName()).collection(formattedDate).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                int i = 0;
+                for (DocumentSnapshot document : task.getResult()){
+                    i++;
+                }
+                String string = "(" + i + ")";
+                mNumberOfPeople.setText(string);
+            }
+        });
     }
+
 }

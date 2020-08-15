@@ -3,18 +3,33 @@
     <string name="tab_label1">Map View</string>
     <string name="tab_label2">List View</string>
     <string name="tab_label3">Workmates</string>
-    <!-- Used in NavigationDrawer -->
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="connection_succeed">Success</string>
     <string name="error_no_internet">error no internet</string>
     <string name="error_unknown_error">unknown error</string>
     <string name="error_authentication_canceled">error authentification canceled</string>
-    <string name="facebook_application_id" translatable="false">193425391869892</string>
-    <string name="facebook_login_protocol_scheme" translatable="false" tools:ignore="UnusedResources">193425391869892</string>
+    <string name="facebook_application_id" translatable="true">193425391869892</string>
+    <string name="facebook_login_protocol_scheme" translatable="true" tools:ignore="UnusedResources">193425391869892</string>
     <string name="title_activity_maps">Map</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="info_no_email_found">emailnotfound</string>
     <string name="info_no_username_found">usernamenotfound</string>
+    <string name="call">CALL</string>
+    <string name="website">WEBSITE</string>
+    <string name="iseatingat">\" is eating at \"</string>
+    <string name="hasntdecided">\" hasn\'t decided yet\"</string>
+    <string name="isjoining">\" is joining!\"</string>
+    <string name="NoHoursFound">No hours found</string>
+    <string name="notifON">Notifications enabled</string>
+    <string name="notifOFF">Notifications disabled</string>
+    <string name="alreadysignupthisrest">You already sign up for this restaurant</string>
+    <string name="alreadysignupanotherrest">You already sign up for an another restaurant</string>
+    <string name="noPhoneAvailable">No Phone number available</string>
+    <string name="likeRegistered">Like successfully registered</string>
+    <string name="alreadtlikethisrest">You already liked this restaurant</string>
+    <string name="noWebsiteFound">No Website found</string>
+    <string name="permissionDenied">Permission DENIED</string>
+    <string name="NoPhonenumberavailable">No phone number available</string>
 
 </resources>
