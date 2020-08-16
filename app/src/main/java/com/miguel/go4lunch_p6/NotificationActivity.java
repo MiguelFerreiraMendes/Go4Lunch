@@ -49,7 +49,7 @@ public class NotificationActivity extends AppCompatActivity {
                     Toast.makeText(NotificationActivity.this, R.string.notifON, Toast.LENGTH_SHORT).show();
 
                 } else {
-                    stopAlarm();
+                    startAlarm();
                     mSharedPreferences.edit().putString("notif", "false").apply();
                     Toast.makeText(NotificationActivity.this, R.string.notifOFF, Toast.LENGTH_SHORT).show();
                 }
@@ -58,7 +58,7 @@ public class NotificationActivity extends AppCompatActivity {
 
     }
 
-    private void startAlarm() {
+    public void startAlarm() {
 
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(System.currentTimeMillis());
@@ -72,12 +72,6 @@ public class NotificationActivity extends AppCompatActivity {
                 AlarmManager.INTERVAL_DAY, pendingIntent);
     }
 
-    private void stopAlarm(){
-        Intent intent = new Intent(this, AlertReceiver.class);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), 1253, intent, 0);
-        AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
-        alarmManager.cancel(pendingIntent);
-    }
 
     private void createNotificationChannels() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){

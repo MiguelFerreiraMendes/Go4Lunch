@@ -6,6 +6,7 @@ import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Build;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -17,12 +18,16 @@ import com.miguel.go4lunch_p6.api.UserHelper;
 import androidx.annotation.NonNull;
 import androidx.core.app.NotificationCompat;
 
+import static android.content.Context.MODE_PRIVATE;
+
 
 public class AlertReceiver extends BroadcastReceiver {
 
     private NotificationManager notificationManager;
+    private SharedPreferences mSharedPreferences;
     private Context mContext;
     private String userID = FirebaseAuth.getInstance().getCurrentUser().getUid();
+
 
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -30,33 +35,42 @@ public class AlertReceiver extends BroadcastReceiver {
         updateNotification();
     }
 
-    private void updateNotification(){
+    private void updateNotification() {
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            CharSequence name = "Channel";
-            String description = "Channel description";
-            int importance = NotificationManager.IMPORTANCE_DEFAULT;
-            NotificationChannel channel = new NotificationChannel("mychannel", name, importance);
-            channel.setDescription(description);
-            notificationManager.createNotificationChannel(channel);
-        }
-        UserHelper.getUsersCollection().document(userID).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                String nameRestaurant = task.getResult().get("restaurantInteressed").toString();
-                Notification notification = new NotificationCompat.Builder(mContext, "mychannel")
-                        .setContentTitle("Almost Lunch time !")
-                        .setContentText("Don't forget ! You're eating at : " + nameRestaurant + "")
-                        .setPriority(NotificationCompat.PRIORITY_HIGH)
-                        .setCategory(NotificationCompat.CATEGORY_ALARM)
-                        .setSmallIcon(R.drawable.ic_launcher_foreground)
-                        .build();
-                notificationManager.notify(1, notification);
+        mSharedPreferences = mContext.getSharedPreferences("notifications", MODE_PRIVATE);
 
-                UserHelper.getUsersCollection().document(userID).update("restaurantInteressed", "false");
+        if (mSharedPreferences.getString("notif", "def").equals("true")) {
 
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                CharSequence name = "Channel";
+                String description = "Channel description";
+                int importance = NotificationManager.IMPORTANCE_DEFAULT;
+                NotificationChannel channel = new NotificationChannel("mychannel", name, importance);
+                channel.setDescription(description);
+                notificationManager.createNotificationChannel(channel);
             }
-        });
+            UserHelper.getUsersCollection().document(userID).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                    String nameRestaurant = task.getResult().get("restaurantInteressed").toString();
+                    Notification notification = new NotificationCompat.Builder(mContext, "mychannel")
+                            .setContentTitle("Almost Lunch time !")
+                            .setContentText("Don't forget ! You're eating at : " + nameRestaurant + "")
+                            .setPriority(NotificationCompat.PRIORITY_HIGH)
+                            .setCategory(NotificationCompat.CATEGORY_ALARM)
+                            .setSmallIcon(R.drawable.ic_launcher_foreground)
+                            .build();
+                    notificationManager.notify(1, notification);
+
+                    UserHelper.getUsersCollection().document(userID).update("restaurantInteressed", "false");
+
+                }
+            });
+        } else {
+            UserHelper.getUsersCollection().document(userID).update("restaurantInteressed", "false");
+
+        }
     }
 }
 
