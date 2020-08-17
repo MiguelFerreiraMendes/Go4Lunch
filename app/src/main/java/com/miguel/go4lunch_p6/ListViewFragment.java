@@ -51,7 +51,7 @@ public class ListViewFragment extends Fragment implements CallRestaurant.Callbac
             int size = jsonResponse.getResult().size();
         mRecyclerView = result.findViewById(R.id.recycleview_view_listview);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
-            for (int i = 0; i <= size - 1; i++){
+            for (int i = 0; i < size; i++){
                 CallRestaurant.fetchRestaurantDetails(this, jsonResponse.getResult().get(i).getPlace_id());
             }
         }

@@ -32,7 +32,6 @@ public class NotificationActivity extends AppCompatActivity {
         if (mSharedPreferences.getString("notif", "def").equals("def")){
             button.setChecked(false);
         }
-
         if (mSharedPreferences.getString("notif", "def").equals("false")){
             button.setChecked(false);
         }

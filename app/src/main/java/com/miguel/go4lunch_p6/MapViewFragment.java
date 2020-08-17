@@ -69,7 +69,6 @@ public class MapViewFragment extends Fragment implements CallRestaurant.Callback
     private String myuserID = FirebaseAuth.getInstance().getCurrentUser().getUid();
     private List<Marker> listmarker = new ArrayList<>();
     private List<Marker> listfilterfull;
-    OnDataPass datapasser;
 
 
     public static MapViewFragment newInstance() {
@@ -77,14 +76,10 @@ public class MapViewFragment extends Fragment implements CallRestaurant.Callback
         return (fragment);
     }
 
-    public interface OnDataPass {
-        public void onDataPass(List<Marker> list);
-    }
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        datapasser = (OnDataPass) context;
     }
 
     @Override
@@ -348,8 +343,6 @@ public class MapViewFragment extends Fragment implements CallRestaurant.Callback
                         .snippet(listmarker.get(i).getSnippet())
                         .title(listmarker.get(i).getTitle()));
             }
-            ((MainActivity) getActivity()).dataChanged();
-
         }
     };
 }

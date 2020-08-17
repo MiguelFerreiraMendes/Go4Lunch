@@ -36,7 +36,7 @@ import com.miguel.go4lunch_p6.models.User;
 
 import java.util.List;
 
-public class MainActivity extends BaseActivity implements NavigationView.OnNavigationItemSelectedListener, ListViewFragment.OnAdapteurPass, MapViewFragment.OnDataPass {
+public class MainActivity extends BaseActivity implements NavigationView.OnNavigationItemSelectedListener, ListViewFragment.OnAdapteurPass {
 
     private NavigationView navigationView;
     private DrawerLayout drawerLayout;
@@ -48,7 +48,6 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     private ListViewAdapter mAdapter = null;
     private String myuserID = FirebaseAuth.getInstance().getCurrentUser().getUid();
     private User currentUser;
-    private List<Marker> mMarkerList;
     private ViewPager mViewPager;
     private MapViewFragment mFragmentMapView;
     int position;
@@ -94,7 +93,10 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                mFragmentMapView = (MapViewFragment) getSupportFragmentManager().findFragmentByTag("android:switcher:" + R.id.viewpager + ":" + mViewPager.getCurrentItem());
+                try {
+                    mFragmentMapView = (MapViewFragment) getSupportFragmentManager().findFragmentByTag("android:switcher:" + R.id.viewpager + ":" + mViewPager.getCurrentItem());
+                } catch (ClassCastException ignored){
+                }
                 if (mAdapter!= null){
                     mAdapter.getFilter().filter(newText);
                 }
@@ -199,11 +201,6 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     @Override
     public void onAdapteurPass(ListViewAdapter adapteur) {
         this.mAdapter = adapteur;
-    }
-
-    @Override
-    public void onDataPass(List<Marker> data) {
-        this.mMarkerList = data;
     }
 
 }
