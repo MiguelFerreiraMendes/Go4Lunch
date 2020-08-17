@@ -71,7 +71,6 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         this.textInputEditTextUsername = navhearderview.findViewById(R.id.NameNav);
         this.textViewEmail = navhearderview.findViewById(R.id.AdressNav);
         this.updateUIWhenCreating();
-        updateUsernameInFirebase();
         UserHelper.getUsersCollection().document(myuserID).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
@@ -109,13 +108,6 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         return true;
     }
 
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-
-        if (id == R.id.menu_activity_main_search){
-        }
-        return super.onOptionsItemSelected(item);
-    }
 
     public void dataChanged() {
         mViewPager.getAdapter().notifyDataSetChanged();
@@ -156,7 +148,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         int id = menuItem.getItemId();
         switch (id){
             case R.id.your_lunch:
-                if (currentUser.getIdOfRestaurantInteressed() != null){
+                if (!currentUser.getIdOfRestaurantInteressed().equals("null")){
                 Intent intent = new Intent(MainActivity.this , RestaurantDetailsActivity.class);
                 intent.putExtra("place_id", currentUser.getIdOfRestaurantInteressed());
                 startActivity(intent);
@@ -203,25 +195,6 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         toggle.syncState();
     }
 
-    protected OnFailureListener onFailureListener(){
-        return new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                Toast.makeText(getApplicationContext(), getString(R.string.error_unknown_error), Toast.LENGTH_LONG).show();
-            }
-        };
-    }
-
-    private void updateUsernameInFirebase(){
-
-        String username = this.textInputEditTextUsername.getText().toString();
-
-        if (this.getCurrentUser() != null){
-            if (!username.isEmpty() &&  !username.equals(getString(R.string.info_no_username_found))){
-                UserHelper.updateUsername(username, this.getCurrentUser().getUid()).addOnFailureListener(this.onFailureListener()).addOnSuccessListener(this.updateUIAfterRESTRequestsCompleted(UPDATE_USERNAME));
-            }
-        }
-    }
 
     @Override
     public void onAdapteurPass(ListViewAdapter adapteur) {
